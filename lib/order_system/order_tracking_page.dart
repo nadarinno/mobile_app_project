@@ -36,6 +36,7 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
       estimate: 'Estimated time: 4 Days',
       icon: Icons.inventory,
     ),
+
     OrderStep(
       title: 'ON THE WAY',
       description: 'Your order is placed successfully. Our agent will soon deliver the products.',
@@ -204,14 +205,11 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
     );
   }
 }
-
 class OrderStep {
   final String title;
   final String description;
   final String estimate;
   final IconData icon;
-
-
   OrderStep({
     required this.title,
     required this.description,
