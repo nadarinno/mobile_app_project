@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:mobile_app_project/Auth/Login.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -15,14 +15,21 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true, // Center the title
-        title: const Text(
-          'Home',
-          style: TextStyle(
-            color: Color(0xFF561C24), // Set text color to white
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0), // Optional padding
+          child: Image.asset(
+            'assets/images/smalllogo.png', // Replace with your logo path
+            fit: BoxFit.contain,
           ),
         ),
-        backgroundColor: const Color(0xFF561C24),
+        centerTitle: true,
+        title: const Text(
+          'Cozy Shop',
+          style: TextStyle(
+            color: Color(0xFF561C24),
+          ),
+        ),
+        backgroundColor: const Color(0xFFFFFDF6),
         actions: [
           Stack(
             clipBehavior: Clip.none,
@@ -30,9 +37,13 @@ class _HomePageState extends State<HomePage> {
               IconButton(
                 icon: const Icon(
                   Icons.notifications,
-                  color: Colors.white, // Make icon white
+                  color: Color(0xFF561C24),
                 ),
                 onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Login()),
+                  );
                   print("Notification Icon Clicked");
                 },
               ),
@@ -44,7 +55,7 @@ class _HomePageState extends State<HomePage> {
                     radius: 10,
                     backgroundColor: Colors.red,
                     child: Text(
-                      '!', // Replace with notificationCount if dynamic
+                      '!',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white,
@@ -56,6 +67,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+
 
       body: Padding(
         padding: const EdgeInsets.all(12.0),
