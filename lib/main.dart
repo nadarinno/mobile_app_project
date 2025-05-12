@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/auth/Login.dart';
+import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+      demoProjectId:'demo-cozyshop-bdc9e'
+  );
+  runApp(MyApp());
 }
+// void main() {
+//   runApp(const MyApp());
+// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

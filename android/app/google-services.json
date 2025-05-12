@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "214977947385",
+    "project_id": "cozyshop-bdc9e",
+    "storage_bucket": "cozyshop-bdc9e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214977947385:android:ada64d2bf469b6ec84e428",
+        "android_client_info": {
+          "package_name": "com.example.mobile_app_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtozPxj4ujORSe-3rB5UFHP0ISKmjymzM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
