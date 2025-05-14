@@ -1,3 +1,9 @@
+plugins {
+
+    id("com.google.gms.google-services")
+
+}
+
 allprojects {
     repositories {
         google()
