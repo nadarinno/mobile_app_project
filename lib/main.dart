@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
 
 // import 'package:flutter/material.dart';
 // import 'package:flutter_localizations/flutter_localizations.dart'; // ← ضروري
-//
+//قشلشي
 // import 'user_settings/settings.dart'; // بدلها حسب اسم ملفك
 //
 // void main() {
