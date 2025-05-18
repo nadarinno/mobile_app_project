@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+const Color primaryColor = Color(0xFF561C24);
 
 void main() => runApp(const MyApp());
 
@@ -38,6 +39,8 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   bool _receiveNotifications = true;
   String _name = '', _email = '', _phone = '', _location = '', _selectedLanguage = 'en';
   bool _isEditingName = false, _isEditingEmail = false, _isEditingPhone = false, _isEditingLocation = false;
@@ -77,10 +80,10 @@ class _SettingPageState extends State<SettingPage> {
   );
 
   Widget _card({required Widget child}) => Card(
-    elevation: 5,
+    elevation: 3,
     margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-    color: const Color(0xFFE5E1DA),
+    color: const Color(0xFFFFFDF6),//0xFFFFFDF6 0xFFE5E1DA
     child: child,
   );
 
@@ -99,7 +102,7 @@ class _SettingPageState extends State<SettingPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ListTile(leading: Icon(icon), title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)), onTap: onTap),
+          ListTile( leading: Icon(icon, color: primaryColor), title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold ,color: primaryColor, )), onTap: onTap),
           if (isEditing) ...[
             Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: child),
             Padding(
@@ -123,7 +126,67 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget _actionButton(String text, VoidCallback onPressed) {
     return TextButton(
-      onPressed: () {
+        onPressed: () {
+          bool isEmailValid = true;
+          bool isPhoneValid = true;
+          if (_isEditingName && _name.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Name cannot be empty!'),
+                backgroundColor:  Color(0xFF561C24),
+              ),
+            );
+            return;
+          }
+
+          if (_isEditingLocation && _location.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Location cannot be empty!'),
+                backgroundColor:   Color(0xFF561C24),
+              ),
+            );
+            return;
+          }
+
+          if (_isEditingEmail) {
+            final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+            isEmailValid = emailRegex.hasMatch(_emailController.text.trim());
+          }
+
+          if (_isEditingPhone) {
+            final phoneRegex = RegExp(r'^\d{10}$'); // حسب التنسيق اللي بدكياه
+            isPhoneValid = phoneRegex.hasMatch(_phoneController.text.trim());
+          }
+
+          if (!isEmailValid || !isPhoneValid) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  !isEmailValid
+                      ? 'Please enter a valid email address'
+                      : 'Please enter a valid phone number',
+                ),
+                backgroundColor:const Color(0xFF561C24)  ,
+              ),
+            );
+            return; // ما نكمل الحفظ إذا البيانات غلط
+          }
+
+          // إذا كلشي تمام، نكمل الحفظ
+          setState(() {
+            if (_isEditingName) _isEditingName = false;
+            if (_isEditingEmail) _isEditingEmail = false;
+            if (_isEditingPhone) _isEditingPhone = false;
+            if (_isEditingLocation) _isEditingLocation = false;
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Saved successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
         onPressed();
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(text == 'تم' || text == 'حفظ' ? 'تم الحفظ بنجاح' : 'Saved successfully'),
@@ -141,15 +204,20 @@ class _SettingPageState extends State<SettingPage> {
 
     return Scaffold(
       appBar: AppBar(
+        iconTheme: const IconThemeData(color: primaryColor),
         title: Text(isArabic ? 'الإعدادات' : 'Settings',
-            style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFFFDF6))),
-        backgroundColor: const Color(0xFF561C24),
+
+          style: const TextStyle(fontWeight: FontWeight.bold, color: primaryColor)),
+        backgroundColor: const Color(0xFFE5E1DA),  centerTitle: true,
+
       ),
-      backgroundColor: const Color(0xFFFFFDF6),
+      backgroundColor: const Color(0xFFE5E1DA),
       body: ListView(
         children: [
+
           _sectionTitle(isArabic ? 'إعدادات الحساب' : 'Account Settings'),
           _editableTile(
+
             title: isArabic ? 'تغيير الاسم' : 'Change Name',
             icon: Icons.person,
             isEditing: _isEditingName,
@@ -161,6 +229,7 @@ class _SettingPageState extends State<SettingPage> {
             ),
           ),
           _editableTile(
+
             title: isArabic ? 'تغيير البريد الإلكتروني' : 'Change Email',
             icon: Icons.email,
             isEditing: _isEditingEmail,
@@ -174,7 +243,7 @@ class _SettingPageState extends State<SettingPage> {
                 errorText: _emailError,
                 suffixIcon: _emailValid
                     ? const Icon(Icons.check_circle, color: Colors.green)
-                    : (_emailError != null ? const Icon(Icons.cancel, color: Colors.red) : null),
+                    : (_emailError != null ? const Icon(Icons.cancel, color: Color(0xFF561C24)) : null),
               ),
               onChanged: (v) => _email = v,
               keyboardType: TextInputType.emailAddress,
@@ -194,7 +263,7 @@ class _SettingPageState extends State<SettingPage> {
                 errorText: _phoneError,
                 suffixIcon: _phoneValid
                     ? const Icon(Icons.check_circle, color: Colors.green)
-                    : (_phoneError != null ? const Icon(Icons.cancel, color: Colors.red) : null),
+                    : (_phoneError != null ? const Icon(Icons.cancel, color: Color(0xFF561C24)) : null),
               ),
               keyboardType: TextInputType.phone,
               onChanged: (v) => _phone = v,
@@ -202,9 +271,9 @@ class _SettingPageState extends State<SettingPage> {
           ),
           _card(
             child: ListTile(
-              leading: const Icon(Icons.lock),
+               leading: Icon(Icons.lock, color: primaryColor),
               title: Text(isArabic ? 'تغيير كلمة المرور' : 'Change Password',
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: primaryColor), ),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChangePasswordPage())),
             ),
           ),
@@ -212,32 +281,37 @@ class _SettingPageState extends State<SettingPage> {
           _sectionTitle(isArabic ? 'التفضيلات' : 'Preferences'),
           _card(
             child: ListTile(
-              leading: const Icon(Icons.language),
+
+              leading: Icon(Icons.language, color: primaryColor),
               title: Text(isArabic ? 'اختيار اللغة' : 'Choose Language',
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
-              trailing: DropdownButton<String>(
-                value: _selectedLanguage,
-                dropdownColor: const Color(0xFFE5E1DA),
-                items: const [
-                  DropdownMenuItem(value: 'en', child: Text('English')),
-                  DropdownMenuItem(value: 'ar', child: Text('العربية')),
-                ],
-                onChanged: (val) {
-                  if (val != null) {
-                    setState(() => _selectedLanguage = val);
-                    widget.onLanguageChange(val);
-                  }
-                },
+                style: const TextStyle(fontWeight: FontWeight.bold, color: primaryColor),),
+              trailing: IconTheme(
+                data: const IconThemeData(color: primaryColor),
+                child: DropdownButton<String>(
+                  value: _selectedLanguage,
+                  dropdownColor: const Color(0xFFE5E1DA),
+                  items: const [
+                    DropdownMenuItem(value: 'en', child: Text('English')),
+                    DropdownMenuItem(value: 'ar', child: Text('العربية')),
+                  ],
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() => _selectedLanguage = val);
+                      widget.onLanguageChange(val);
+                    }
+                  },
+                ),
               ),
+
             ),
           ),
           _card(
             child: SwitchListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-              secondary: const Icon(Icons.notifications),
+              secondary: const Icon(Icons.notifications, color: primaryColor),
               title: Text(
                 isArabic ? 'استقبال الإشعارات' : 'Receive Notifications',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: primaryColor),
               ),
               value: _receiveNotifications,
               onChanged: (val) => setState(() => _receiveNotifications = val),
@@ -259,21 +333,70 @@ class _SettingPageState extends State<SettingPage> {
           ),
           _card(
             child: ListTile(
-              leading: const Icon(Icons.payment),
+              leading: Icon(Icons.payment, color: primaryColor),
               title: Text(isArabic ? 'طريقة الدفع' : 'Select Payment Method',
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: primaryColor),),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentPage())),
             ),
           ),
           const Divider(),
           _card(
             child: ListTile(
-              leading: const Icon(Icons.logout, color: Color(0xFF561C24)),
+              leading: Icon(Icons.logout, color: primaryColor),
               title: Text(isArabic ? 'تسجيل الخروج' : 'Log Out',
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF561C24))),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: primaryColor),),
               onTap: () {},
             ),
+
           ),
+          _card(
+            child: ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: Text(
+                isArabic ? 'حذف الحساب' : 'Delete Account',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: Text(isArabic ? 'تأكيد الحذف' : 'Confirm Deletion'),
+                    content: Text(
+                      isArabic
+                          ? 'هل أنت متأكد أنك تريد حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء.'
+                          : 'Are you sure you want to delete your account? This action cannot be undone.',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(isArabic ? 'إلغاء' : 'Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(isArabic
+                                  ? 'تم حذف الحساب بنجاح'
+                                  : 'Account deleted successfully'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+
+                        },
+                        style: TextButton.styleFrom(foregroundColor: Colors.red),
+                        child: Text(isArabic ? 'حذف' : 'Delete'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+
         ],
       ),
     );

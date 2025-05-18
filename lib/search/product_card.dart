@@ -1,3 +1,4 @@
+// product_card.dart
 import 'package:flutter/material.dart';
 
 class ProductCard extends StatelessWidget {
@@ -6,6 +7,8 @@ class ProductCard extends StatelessWidget {
   final String imagePath;
   final bool isSaved;
   final VoidCallback onSavePressed;
+  final Color priceColor;
+  final Color favoriteActiveColor;
 
   const ProductCard({
     super.key,
@@ -14,13 +17,15 @@ class ProductCard extends StatelessWidget {
     required this.imagePath,
     required this.isSaved,
     required this.onSavePressed,
+    this.priceColor = const Color(0xFF561C24),
+    this.favoriteActiveColor = const Color(0xFF561C24),
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: const Color(0xFFF5F3ED),
-      elevation: 3,
+      color: const Color(0xFFFFFDF6),
+      elevation: 1,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -57,9 +62,9 @@ class ProductCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
               '\$${price.toStringAsFixed(2)}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: Colors.black87,
+                color: priceColor,
               ),
             ),
           ),
@@ -68,7 +73,7 @@ class ProductCard extends StatelessWidget {
             child: IconButton(
               icon: Icon(
                 isSaved ? Icons.favorite : Icons.favorite_border,
-                color: isSaved ? Colors.red : Colors.grey,
+                color: isSaved ? favoriteActiveColor : Colors.grey,
               ),
               onPressed: onSavePressed,
             ),

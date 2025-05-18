@@ -1,14 +1,22 @@
 // searched_page.dart
 import 'package:flutter/material.dart';
-import 'product_card.dart'; // تأكد من استيراد ملف الـ `ProductCard` الصحيح
+import 'product_card.dart';
 
-class SearchedPage extends StatelessWidget {
+class SearchedPage extends StatefulWidget {
   final String searchQuery;
-  static const Color burgundy = Color(0xFF561C24);
-  static const Color lightBurgundy = Color(0xFFD9B6A3);
-  static const Color beige = Color(0xFFE5E1DA);
 
   const SearchedPage({super.key, required this.searchQuery});
+
+  @override
+  State<SearchedPage> createState() => _SearchedPageState();
+}
+
+class _SearchedPageState extends State<SearchedPage> {
+  static const Color burgundy = Color(0xFF561C24);
+  static const Color beige = Color(0xFFE5E1DA);
+
+
+  List<bool> savedStatus = List<bool>.filled(8, false);
 
   @override
   Widget build(BuildContext context) {
@@ -16,16 +24,16 @@ class SearchedPage extends StatelessWidget {
       backgroundColor: beige,
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: burgundy,
+        backgroundColor: beige,
         title: Text(
-
-          ' $searchQuery',
-          style: const TextStyle(color: Color(0xFFFFFDF6), fontWeight: FontWeight.bold),
+          ' ${widget.searchQuery}',
+          style: const TextStyle(
+              color: Color(0xFF561C24), fontWeight: FontWeight.bold),
         ),
       ),
       body: GridView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: 8, // عدد مؤقت لعرض النتائج
+        itemCount: 8,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 16,
@@ -34,12 +42,16 @@ class SearchedPage extends StatelessWidget {
         ),
         itemBuilder: (context, index) {
           return ProductCard(
-            productName: '$searchQuery Item ${index + 1}',
+            productName: '${widget.searchQuery} Item ${index + 1}',
             price: 29.99,
             imagePath: 'assets/images/cozyshoplogo.png',
-            isSaved: false,
+            isSaved: savedStatus[index],
+            priceColor: burgundy,
+            favoriteActiveColor: burgundy,
             onSavePressed: () {
-
+              setState(() {
+                savedStatus[index] = !savedStatus[index];
+              });
             },
           );
         },
