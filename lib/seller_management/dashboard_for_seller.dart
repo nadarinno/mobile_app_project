@@ -125,6 +125,8 @@ class _SellerDashboardState extends State<SellerDashboard> {
           itemBuilder: (context, index) {
             final doc = docs[index];
             final p = doc.data() as Map<String, dynamic>;
+            final imageUrls = p['images'] as List<dynamic>? ?? [];
+            final firstImage = imageUrls.isNotEmpty ? imageUrls[0] as String : null;
 
             final price = (p['price'] is num) ? (p['price'] as num).toDouble() : 0.0;
             final quantity = (p['quantity'] is num) ? (p['quantity'] as num).toInt() : 0;
@@ -136,9 +138,9 @@ class _SellerDashboardState extends State<SellerDashboard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (p['image'] != null)
+                  if (firstImage != null)
                     Image.network(
-                      p['image'],
+                      firstImage,
                       height: 150,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -186,6 +188,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                               children: [
                                 Text("Quantity: $quantity", style: TextStyle(fontWeight: FontWeight.bold)),
                                 Text("Value: \$${inventoryValue.toStringAsFixed(2)}", style: TextStyle(fontWeight: FontWeight.bold)),
+                                Text("Images: ${imageUrls.length}", style: TextStyle(fontWeight: FontWeight.bold)),
                               ],
                             ),
                             SizedBox(width: 8),

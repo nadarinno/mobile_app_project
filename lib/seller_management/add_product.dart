@@ -28,14 +28,14 @@ class _AddProductDialogState extends State<AddProductDialog> {
 
   List<String> selectedColors = [];
   List<String> availableColors = ['Red', 'Blue', 'Green', 'Black', 'White', 'Yellow', 'Purple', 'Orange', 'Pink'];
-  File? _imageFile;
+  List<File> _imageFiles = [];
 
   Future<void> pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _imageFile = File(pickedFile.path);
+        _imageFiles.add(File(pickedFile.path));
       });
     }
   }
@@ -51,14 +51,19 @@ class _AddProductDialogState extends State<AddProductDialog> {
     }
   }
 
-  Future<String> uploadImage(File image) async {
+  Future<List<String>> uploadImages(List<File> images) async {
     try {
-      final fileName = 'product_images/${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final ref = FirebaseStorage.instance.ref().child(fileName);
-      final uploadTask = await ref.putFile(image);
-      return await uploadTask.ref.getDownloadURL();
+      List<String> imageUrls = [];
+      for (var image in images) {
+        final fileName = 'product_images/${DateTime.now().millisecondsSinceEpoch}_${image.hashCode}.jpg';
+        final ref = FirebaseStorage.instance.ref().child(fileName);
+        final uploadTask = await ref.putFile(image);
+        final url = await uploadTask.ref.getDownloadURL();
+        imageUrls.add(url);
+      }
+      return imageUrls;
     } catch (e) {
-      throw Exception("Failed to upload image: $e");
+      throw Exception("Failed to upload images: $e");
     }
   }
 
@@ -81,18 +86,18 @@ class _AddProductDialogState extends State<AddProductDialog> {
       if (price <= 0) throw Exception("Price must be greater than 0");
       if (quantity < 0) throw Exception("Quantity cannot be negative");
 
-      String? imageUrl;
-      if (_imageFile != null) {
-        print("Uploading image...");
+      List<String> imageUrls = [];
+      if (_imageFiles.isNotEmpty) {
+        print("Uploading images...");
         try {
-          imageUrl = await uploadImage(_imageFile!);
-          print("Image uploaded successfully: $imageUrl");
+          imageUrls = await uploadImages(_imageFiles);
+          print("Images uploaded successfully: $imageUrls");
         } catch (e) {
           print("Image upload failed: $e");
           throw Exception("Image upload failed: $e");
         }
       } else {
-        print("No image selected");
+        print("No images selected");
       }
 
       final product = {
@@ -100,7 +105,7 @@ class _AddProductDialogState extends State<AddProductDialog> {
         'price': price,
         'quantity': quantity,
         'description': description,
-        'image': imageUrl,
+        'images': imageUrls,
         'colors': selectedColors,
         'createdAt': FieldValue.serverTimestamp(),
       };
@@ -108,11 +113,10 @@ class _AddProductDialogState extends State<AddProductDialog> {
       print("Saving to Firestore...");
       final docRef = await _firestore.collection('products').add(product);
       print("✅ Product saved with ID: ${docRef.id}");
-print(product);
-print (docRef);
+      print(product);
+      print(docRef);
       widget.updateTotals();
 
-      // Reset the form
       setState(() {
         nameController.clear();
         priceController.clear();
@@ -120,16 +124,14 @@ print (docRef);
         descriptionController.clear();
         _colorController.clear();
         selectedColors.clear();
-        _imageFile = null;
+        _imageFiles.clear();
         _formKey.currentState!.reset();
       });
 
-      // Use the current context instead of parentContext
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Product added successfully!')),
       );
 
-      // Close the dialog after successful save
       Navigator.of(context).pop();
     } catch (e) {
       print("Error saving product: $e");
@@ -260,30 +262,54 @@ print (docRef);
                 }).toList(),
               ),
               SizedBox(height: 16),
-              Text("Product Image:", style: TextStyle(fontWeight: FontWeight.bold)),
-              GestureDetector(
-                onTap: pickImage,
-                child: Container(
-                  height: 150,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
+              Text("Product Images:", style: TextStyle(fontWeight: FontWeight.bold)),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ..._imageFiles.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final image = entry.value;
+                    return Stack(
+                      children: [
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Image.file(image, fit: BoxFit.cover),
+                        ),
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: IconButton(
+                            icon: Icon(Icons.close, size: 18, color: Colors.red),
+                            onPressed: () {
+                              setState(() {
+                                _imageFiles.removeAt(index);
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                  GestureDetector(
+                    onTap: pickImage,
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(child: Icon(Icons.add_a_photo, size: 50)),
+                    ),
                   ),
-                  child: _imageFile != null
-                      ? Image.file(_imageFile!, fit: BoxFit.cover)
-                      : Center(child: Icon(Icons.add_a_photo, size: 50)),
-                ),
+                ],
               ),
-              if (_imageFile != null)
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _imageFile = null;
-                    });
-                  },
-                  child: Text('Remove Image', style: TextStyle(color: Colors.red)),
-                ),
             ],
           ),
         ),
