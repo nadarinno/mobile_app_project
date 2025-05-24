@@ -3,23 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../firebase_options.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(ProductDetailApp());
-}
-
-class ProductDetailApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: ProductDetailsPage(productId: '1'),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
 
 class ProductDetailsPage extends StatefulWidget {
   final String productId;
