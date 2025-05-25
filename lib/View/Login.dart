@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app_project/Home/HomePage.dart';
+import 'package:mobile_app_project/View/HomePage.dart';
 import 'SignUp.dart';
+import 'SellerSignUp.dart';
 import 'ForgotPasswordPage.dart';
-
+import 'package:mobile_app_project/Controller/LoginController.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -13,46 +14,31 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final LoginController controller = LoginController();
 
-  void _submitForm() {
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
-          );
-      print('Login Successful');
-      print('Email: ${_emailController.text}');
-      print('Password: ${_passwordController.text}');
-    }
-  }
+      String? result = await controller.login(context);
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Email is required';
+      if (result == 'success') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      }
     }
-    final emailRegex = RegExp(r'^[\w._%+-]+@[\w.-]+\.[a-zA-Z]{2,}$');
-    if (!emailRegex.hasMatch(value.trim())) {
-      return 'Enter a valid email';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Password is required';
-    }
-    if (value.length < 8) {
-      return 'Password must be at least 8 characters';
-    }
-    return null;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFDF6), // Background color
+      backgroundColor: const Color(0xFFFFFDF6),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -79,41 +65,45 @@ class _LoginState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 30),
-              // Email Field
+              if (controller.errorMessage != null)
+                Center(
+                  child: Text(
+                    controller.errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
+              const SizedBox(height: 10),
               TextFormField(
-                controller: _emailController,
+                controller: controller.emailController,
                 decoration: const InputDecoration(
                   hintText: 'Enter your email',
                   labelText: 'Email',
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.all(12),
                 ),
-                validator: _validateEmail,
+                validator: controller.validateEmail,
               ),
               const SizedBox(height: 20),
-              // Password Field
               TextFormField(
-                controller: _passwordController,
+                controller: controller.passwordController,
                 obscureText: true,
                 decoration: const InputDecoration(
                   labelText: 'Password',
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.all(12.0),
                 ),
-                validator: _validatePassword,
+                validator: controller.validatePassword,
               ),
               const SizedBox(height: 5),
-              // Forgot Password
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
-                    // Navigate to Reset Password screen
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => const ForgotPasswordPage()),
-                    // );
-                    print('Navigate to Forgot Password page');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordPage()),
+                    );
                   },
                   child: const Text(
                     'Forgot Password?',
@@ -125,13 +115,15 @@ class _LoginState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 10),
-              // Login Button
               Center(
-                child: ElevatedButton(
+                child: controller.isLoading
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton(
                   onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF561C24),
-                    padding: const EdgeInsets.symmetric(horizontal: 140, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 140, vertical: 15),
                   ),
                   child: const Text(
                     'Login',
@@ -144,24 +136,47 @@ class _LoginState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 20),
-              // "You don't have an account?" with a "Create Account" button
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "You don't have an account? ",
+                    "New customer? ",
                     style: TextStyle(fontWeight: FontWeight.w400),
                   ),
                   TextButton(
                     onPressed: () {
-                      // Navigate to Sign-Up page
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SignUp()), // Navigate to SignUp page
+                        MaterialPageRoute(builder: (context) => const SignUp()),
                       );
                     },
                     child: const Text(
-                      'Create one',
+                      'Sign Up',
+                      style: TextStyle(
+                        color: Color(0xFF561C24),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Want to sell? ",
+                    style: TextStyle(fontWeight: FontWeight.w400),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SellerSignUp()),
+                      );
+                    },
+                    child: const Text(
+                      'Sign Up as Seller',
                       style: TextStyle(
                         color: Color(0xFF561C24),
                         fontWeight: FontWeight.w600,
