@@ -1,48 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
-import "package:dotted_line/dotted_line.dart";
-
+import 'package:dotted_line/dotted_line.dart';
+import 'package:mobile_app_project/Logic/order_step_model.dart';
+import 'package:mobile_app_project/Controllers/order_tracking_controller.dart';
 
 class OrderTrackingPage extends StatefulWidget {
+  final String orderId;
+
+  OrderTrackingPage({required this.orderId});
+
   @override
   _OrderTrackingPageState createState() => _OrderTrackingPageState();
 }
 
 class _OrderTrackingPageState extends State<OrderTrackingPage> {
-  int currentStep = 0;
-  List<OrderStep> steps = [];
-
-  Future<void> fetchSteps() async {
-    final firestore = FirebaseFirestore.instance;
-
-    // Fetch steps
-    final stepsSnapshot = await firestore.collection('order_steps').get();
-
-    final stepDocs = stepsSnapshot.docs
-        .where((doc) => doc.id.startsWith('step'))
-        .toList()
-      ..sort((a, b) => a.id.compareTo(b.id));
-
-    final fetchedSteps = stepDocs.map((doc) => OrderStep.fromFirestore(doc)).toList();
-
-    // Fetch current step index
-    final currentIndexSnapshot = await firestore
-        .collection('order_steps')
-        .doc('currentStepIndex')
-        .get();
-    final index = currentIndexSnapshot.data()?['index'] ?? 0;
-
-    setState(() {
-      steps = fetchedSteps;
-      currentStep = index;
-    });
-  }
+  late OrderTrackingController controller;
 
   @override
   void initState() {
     super.initState();
-    fetchSteps();
+    controller = OrderTrackingController(orderId: widget.orderId);
+    controller.fetchSteps().then((_) => setState(() {}));
   }
 
   @override
@@ -59,27 +36,22 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
       appBar: AppBar(
         backgroundColor: Color(0xFF561C24),
         centerTitle: true,
-        title: Column(
-          children: [
-            Text('Order Tracking', style: TextStyle(color: Color(0xFFD0B8A8), fontSize: screenWidth * 0.045)),
-            SizedBox(height: 4),
-            Text('#825791537', style: TextStyle(color: Color(0xFFD0B8A8), fontSize: screenWidth * 0.03)),
-          ],
-        ),
+        title: Text('Order Tracking', style: TextStyle(color: Color(0xFFD0B8A8))),
       ),
-      body: steps.isEmpty
+      body: controller.steps.isEmpty
           ? Center(child: CircularProgressIndicator())
           : Padding(
-        padding: EdgeInsets.symmetric(horizontal: paddingHorizontal, vertical: screenHeight * 0.01),
+        padding: EdgeInsets.symmetric(
+            horizontal: paddingHorizontal, vertical: screenHeight * 0.01),
         child: Column(
           children: [
-            SizedBox(height: screenHeight * 0.2),
+            SizedBox(height: screenHeight * 0.05),
             Expanded(
               child: ListView.builder(
-                itemCount: steps.length,
+                itemCount: controller.steps.length,
                 itemBuilder: (context, index) {
-                  final step = steps[index];
-                  final isCompleted = index <= currentStep;
+                  final step = controller.steps[index];
+                  final isCompleted = index <= controller.currentStep;
 
                   return Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,14 +59,8 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
                       Column(
                         children: [
                           GestureDetector(
-                            onTap: () async {
-                              setState(() {
-                                currentStep = index;
-                              });
-                              await FirebaseFirestore.instance
-                                  .collection('order_steps')
-                                  .doc('currentStepIndex')
-                                  .update({'index': index});
+                            onTap: () {
+                              controller.updateOrderStep(index).then((_) => setState(() {}));
                             },
                             child: Container(
                               width: circleSize,
@@ -106,7 +72,8 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
                               ),
                               child: Center(
                                 child: isCompleted
-                                    ? Icon(Icons.check, color: Colors.white, size: circleSize * 0.6)
+                                    ? Icon(Icons.check,
+                                    color: Colors.white, size: circleSize * 0.6)
                                     : Text(
                                   '${index + 1}',
                                   style: TextStyle(
@@ -118,10 +85,11 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
                               ),
                             ),
                           ),
-                          if (index != steps.length - 1)
+                          if (index != controller.steps.length - 1)
                             Container(
                               height: dottedLineHeight,
-                              child: DottedLine(direction: Axis.vertical, dashColor: Color(0xFFD0B8A8)),
+                              child: DottedLine(
+                                  direction: Axis.vertical, dashColor: Color(0xFFD0B8A8)),
                             ),
                         ],
                       ),
@@ -133,10 +101,14 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(step.title,
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: screenWidth * 0.04)),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: screenWidth * 0.04)),
                             SizedBox(height: 4),
                             Text(step.description,
-                                style: TextStyle(color: Color(0xFFD0B8A8), fontSize: screenWidth * 0.035)),
+                                style: TextStyle(
+                                    color: Color(0xFFD0B8A8),
+                                    fontSize: screenWidth * 0.035)),
                             if (step.estimate.isNotEmpty) ...[
                               SizedBox(height: 4),
                               Text(
@@ -157,7 +129,8 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
             ),
             SizedBox(height: screenHeight * 0.01),
             Text('Help Line: 810 855 281 1012',
-                style: TextStyle(color: Color(0xFFD0B8A8), fontSize: screenWidth * 0.03)),
+                style: TextStyle(
+                    color: Color(0xFFD0B8A8), fontSize: screenWidth * 0.03)),
             SizedBox(height: screenHeight * 0.01),
           ],
         ),
@@ -177,39 +150,5 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
         ],
       ),
     );
-  }
-}
-
-class OrderStep {
-  final String title;
-  final String description;
-  final String estimate;
-  final IconData icon;
-
-  OrderStep({required this.title, required this.description, required this.estimate, required this.icon});
-
-  factory OrderStep.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return OrderStep(
-      title: data['title'] ?? '',
-      description: data['description'] ?? '',
-      estimate: data['estimate'] ?? '',
-      icon: getIconData(data['icon'] ?? ''),
-    );
-  }
-
-  static IconData getIconData(String iconName) {
-    switch (iconName) {
-      case 'card_giftcard':
-        return Icons.card_giftcard;
-      case 'inventory':
-        return Icons.inventory;
-      case 'local_shipping':
-        return Icons.local_shipping;
-      case 'favorite_border':
-        return Icons.favorite_border;
-      default:
-        return Icons.help_outline;
-    }
   }
 }

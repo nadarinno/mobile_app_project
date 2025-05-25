@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:mobile_app_project/firebase_options.dart';
-import 'package:mobile_app_project/View/product_details_page.dart';
+import 'package:mobile_app_project/View/order_tracking_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mobile App Project',
+      title: 'Order Tracking App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.brown,
+        scaffoldBackgroundColor: Color(0xFFFFFDF6),
       ),
-      home: ProductDetailsPage(productId: 'product1'),
+      home: OrderTrackingPage(orderId: '825791537'),
     );
   }
 }
