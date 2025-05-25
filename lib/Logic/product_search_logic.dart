@@ -1,50 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'utils.dart';
+import '../Controller/product_search_controller.dart';
 
-class ProductSearchDelegate extends SearchDelegate {
-  final FirebaseFirestore firestore;
+class ProductSearchLogic {
+  final ProductSearchController controller;
 
-  ProductSearchDelegate(this.firestore);
+  ProductSearchLogic(this.controller);
 
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-        icon: Icon(Icons.clear),
-        onPressed: () {
-          query = '';
-        },
-      ),
-    ];
-  }
-
-  @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      icon: Icon(Icons.arrow_back),
-      onPressed: () {
-        close(context, null);
-      },
-    );
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    return _buildSearchResults();
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return _buildSearchResults();
-  }
-
-  Widget _buildSearchResults() {
+  Widget buildSearchResults(BuildContext context, String query) {
     return StreamBuilder<QuerySnapshot>(
-      stream: firestore.collection('products')
-          .where('name', isGreaterThanOrEqualTo: query)
-          .where('name', isLessThan: query + 'z')
-          .snapshots(),
+      stream: controller.getSearchStream(query),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
@@ -71,7 +36,8 @@ class ProductSearchDelegate extends SearchDelegate {
               elevation: 4,
               margin: EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
-                leading: p['image'] != null ? Image.network(
+                leading: p['image'] != null
+                    ? Image.network(
                   p['image'],
                   width: 50,
                   height: 50,
@@ -82,12 +48,13 @@ class ProductSearchDelegate extends SearchDelegate {
                     color: Colors.grey[200],
                     child: Center(child: Icon(Icons.image_not_supported)),
                   ),
-                ) : null,
+                )
+                    : null,
                 title: Text(p['name']?.toString() ?? 'Unnamed Product'),
                 subtitle: Text("\$${price.toStringAsFixed(2)} - Qty: $quantity"),
                 trailing: Text("\$${inventoryValue.toStringAsFixed(2)}"),
                 onTap: () {
-                  close(context, null);
+                  Navigator.of(context).pop();
                 },
               ),
             );
