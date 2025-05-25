@@ -1,34 +1,64 @@
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:mobile_app_project/view/seller_dashboard_view.dart';
-import 'package:mobile_app_project/Controller/seller_dashboard_controller.dart';
-import 'package:mobile_app_project/Logic/seller_dashboard_logic.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mobile_app_project/View/ForgotPasswordPage.dart';
+import 'package:mobile_app_project/View/SellerSignUp.dart';
+import 'package:mobile_app_project/View/SignUp.dart';
+import 'package:mobile_app_project/View//HomePage.dart';
+import 'package:mobile_app_project/View/SavedPage.dart';
+import 'package:mobile_app_project/View/Login.dart';
+import 'package:mobile_app_project/View/PaymentPage.dart';
+import 'package:mobile_app_project/View/NotificationPage.dart';
+import 'Logic/notification_handler.dart';
 import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:mobile_app_project/View/CartPage.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
 
 void main() async {
-WidgetsFlutterBinding.ensureInitialized();
-await Firebase.initializeApp(
-options: DefaultFirebaseOptions.currentPlatform,
-);
-runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+  AndroidInitializationSettings('@mipmap/ic_launcher'); // <- make sure this exists
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+
+  runApp(MyApp());
 }
 
+
 class MyApp extends StatelessWidget {
-@override
-Widget build(BuildContext context) {
-return MaterialApp(
-title: 'Seller Dashboard',
-theme: ThemeData(
-primarySwatch: Colors.deepPurple,
-visualDensity: VisualDensity.adaptivePlatformDensity,
-),
-home: SellerDashboardView(
-controller: SellerDashboardController(FirebaseFirestore.instance),
-logic: SellerDashboardLogic(),
-),
-debugShowCheckedModeBanner: false,
-);
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      ),
+      home: const Login(),
+    );
+  }
 }
-}
+
+
+
+
