@@ -1,136 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mobile_app_project/Controllers/cart_controller.dart';
+import 'package:mobile_app_project/Logic/cart_item_model.dart';
+import 'package:provider/provider.dart';
 
-class CartItem {
-  final String id;
-  final String name;
-  final double price;
-  final String imagePath;
-  int quantity;
-
-  CartItem({
-    required this.id,
-    required this.name,
-    required this.price,
-    required this.imagePath,
-    this.quantity = 1,
-  });
-
-  factory CartItem.fromFirestore(DocumentSnapshot doc) {
-    Map data = doc.data() as Map<String, dynamic>;
-    return CartItem(
-      id: doc.id,
-      name: data['name'] ?? '',
-      price: (data['price'] ?? 0).toDouble(),
-      imagePath: data['images'] ?? '', // ✅ Firebase image URL (String)
-      quantity: data['quantity'] ?? 1,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'name': name,
-      'price': price,
-      'images': imagePath,
-      'quantity': quantity,
-    };
-  }
-}
-
-class CartPage extends StatefulWidget {
-  @override
-  _CartPageState createState() => _CartPageState();
-}
-
-class _CartPageState extends State<CartPage> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  bool selectAll = false;
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration(seconds: 1), () {
-      setState(() {
-        isLoading = false;
-      });
-    });
-  }
-
-  Stream<List<CartItem>> getCartItems() {
-    return _firestore.collection('cart').snapshots().map((snapshot) =>
-        snapshot.docs.map((doc) => CartItem.fromFirestore(doc)).toList());
-  }
-
-  Future<void> updateQuantity(String itemId, int newQuantity) async {
-    if (newQuantity <= 0) {
-      await _firestore.collection('cart').doc(itemId).delete();
-    } else {
-      await _firestore
-          .collection('cart')
-          .doc(itemId)
-          .update({'quantity': newQuantity});
-    }
-  }
-
-  Future<void> removeItem(String itemId) async {
-    await _firestore.collection('cart').doc(itemId).delete();
-  }
-
-  Future<void> toggleSelectAll(bool? value) async {
-    setState(() {
-      selectAll = value ?? false;
-    });
-
-    final snapshot = await _firestore.collection('cart').get();
-    if (selectAll) {
-      for (var doc in snapshot.docs) {
-        await doc.reference.update({'quantity': 1});
-      }
-    } else {
-      for (var doc in snapshot.docs) {
-        await doc.reference.delete();
-      }
-    }
-  }
-
-  double calculateTotalPrice(List<CartItem> items) {
-    return items.fold(0, (sum, item) => sum + item.price * item.quantity);
-  }
-
-  int calculateTotalItems(List<CartItem> items) {
-    return items.fold(0, (sum, item) => sum + item.quantity);
-  }
-
-  Future<void> checkout(List<CartItem> items) async {
-    if (items.isEmpty) return;
-
-    final batch = _firestore.batch();
-    final ordersRef = _firestore.collection('orders').doc();
-
-    batch.set(ordersRef, {
-      'date': DateTime.now(),
-      'items': items.map((item) => item.toMap()).toList(),
-      'total': calculateTotalPrice(items),
-    });
-
-    for (var item in items) {
-      batch.delete(_firestore.collection('cart').doc(item.id));
-    }
-
-    await batch.commit();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Order placed successfully!')),
-    );
-  }
-
+class CartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final controller = Provider.of<CartController>(context);
 
-    if (isLoading) {
+    if (controller.isLoading) {
       return Scaffold(
         backgroundColor: Color(0xFFFFFDF6),
         body: Center(child: CircularProgressIndicator()),
@@ -153,7 +32,7 @@ class _CartPageState extends State<CartPage> {
       ),
       body: SafeArea(
         child: StreamBuilder<List<CartItem>>(
-          stream: getCartItems(),
+          stream: controller.cartItems,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -236,7 +115,7 @@ class _CartPageState extends State<CartPage> {
                                   IconButton(
                                     icon: Icon(Icons.remove_circle_outline,
                                         color: Color(0xFF561C24), size: 20),
-                                    onPressed: () => updateQuantity(
+                                    onPressed: () => controller.updateQuantity(
                                         item.id, item.quantity - 1),
                                   ),
                                   Container(
@@ -247,7 +126,7 @@ class _CartPageState extends State<CartPage> {
                                   IconButton(
                                     icon: Icon(Icons.add_circle_outline,
                                         color: Color(0xFF561C24), size: 20),
-                                    onPressed: () => updateQuantity(
+                                    onPressed: () => controller.updateQuantity(
                                         item.id, item.quantity + 1),
                                   ),
                                 ],
@@ -255,7 +134,7 @@ class _CartPageState extends State<CartPage> {
                               IconButton(
                                 icon: Icon(Icons.delete,
                                     color: Color(0xFF561C24), size: 20),
-                                onPressed: () => removeItem(item.id),
+                                onPressed: () => controller.removeItem(item.id),
                               ),
                             ],
                           ),
@@ -273,8 +152,8 @@ class _CartPageState extends State<CartPage> {
                   child: Row(
                     children: [
                       Checkbox(
-                        value: selectAll,
-                        onChanged: (value) => toggleSelectAll(value),
+                        value: controller.selectAll,
+                        onChanged: (value) => controller.toggleSelectAll(value),
                       ),
                       Text('All'),
                       Spacer(),
@@ -282,14 +161,14 @@ class _CartPageState extends State<CartPage> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Total: \$${calculateTotalPrice(cartItems).toStringAsFixed(2)}',
+                            'Total: \$${controller.getTotalPrice(cartItems).toStringAsFixed(2)}',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            '${calculateTotalItems(cartItems)} items',
+                            '${controller.getTotalItems(cartItems)} items',
                             style: TextStyle(fontSize: 12),
                           ),
                         ],
@@ -300,12 +179,12 @@ class _CartPageState extends State<CartPage> {
                           minimumSize: Size(screenWidth * 0.25, 48),
                           backgroundColor: Color(0xFF561C24),
                         ),
-                        onPressed: () => checkout(cartItems),
+                        onPressed: () => controller.checkout(cartItems, context),
                         child: Text(
                           'Checkout',
                           style: TextStyle(color: Color(0xFFFFFDF6)),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
