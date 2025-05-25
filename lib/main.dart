@@ -1,57 +1,34 @@
-// import 'package:flutter/material.dart';
-// import 'order/order_management.dart';
-//
-// void main() {
-//   runApp(const MyApp());
-// }
-//
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: const OrderManagementPage(),
-//     );
-//   }
-// }
-
-
-// import 'package:flutter/material.dart';
-// import 'search/search_page.dart';
-//
-// void main() {
-//   runApp(const MyApp());
-// }
-//
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       home: const SearchPage(),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'user_settings/settings.dart';
-void main() {
-  runApp(const MyApp());
-}
+// import 'order/order_management.dart';
+//
+// import 'search/product_page.dart';
+import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'admin_dash_board_page/admin_dashboard_page.dart';
+// import 'search/search_page.dart';
+// import 'order/order_management.dart';
+// import 'package:mobile_app_project/View/search_page_view.dart';
+import 'package:mobile_app_project/View/settings_view.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
 
+  );
+  runApp(MyApp());
+}
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
+
 }
 
 class _MyAppState extends State<MyApp> {
-  Locale _locale = const Locale('en');
+ Locale _locale = const Locale('en');
 
   void _changeLanguage(String languageCode) {
     setState(() {
@@ -62,8 +39,13 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+
+
       debugShowCheckedModeBanner: false,
-      locale: _locale,
+      //home: const OrderManagementPage(),
+    //home: const SearchPageView(),
+    //  home:  AdminDashboardPage(),
+     locale: _locale,
       supportedLocales: const [
         Locale('en'),
         Locale('ar'),
@@ -73,8 +55,9 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+
       home: SettingPage(
-        onLanguageChange: _changeLanguage, // تمرير الدالة للصفحة
+        onLanguageChange: _changeLanguage,
         currentLocale: _locale,
       ),
     );
