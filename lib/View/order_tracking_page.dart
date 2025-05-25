@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:mobile_app_project/Logic/order_step_model.dart';
-import 'package:mobile_app_project/Controllers/order_tracking_controller.dart';
+import 'package:mobile_app_project/Controller/order_tracking_controller.dart';
 
 class OrderTrackingPage extends StatefulWidget {
   final String orderId;

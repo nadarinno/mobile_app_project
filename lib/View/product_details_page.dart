@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app_project/Controllers/product_details_controller.dart';
+import 'package:mobile_app_project/Controller/product_details_controller.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final String productId;

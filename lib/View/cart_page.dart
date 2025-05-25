@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app_project/Controllers/cart_controller.dart';
+import 'package:mobile_app_project/Controller/cart_controller.dart';
 import 'package:mobile_app_project/Logic/cart_item_model.dart';
 import 'package:provider/provider.dart';
 
