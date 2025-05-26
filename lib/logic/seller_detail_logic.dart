@@ -25,7 +25,7 @@ class Seller {
       id: id,
       name: data['name'] ?? '',
       email: data['email'] ?? '',
-      phone: data['phone'] ?? '',
+      phone: data['phone']?.toString() ?? '',
       location: data['location'] ?? '',
       business: data['business'] ?? '',
       approved: data['approved'] ?? false,

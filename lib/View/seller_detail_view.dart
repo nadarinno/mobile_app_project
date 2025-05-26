@@ -53,25 +53,30 @@ class SellerDetailPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: burgundy,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(MaterialState.disabled)) {
+                          return Color(0xFF561C24); // لون زر معطل بنفس اللون الخمري
+                        }
+                        return Color(0xFF561C24); // اللون العادي
+                      }),
+                      foregroundColor: MaterialStateProperty.all(Colors.white),
+                      padding: MaterialStateProperty.all(
+                        const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      ),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
                     ),
-                    onPressed: seller.approved
-                        ? null
-                        : () => controller.approveSeller(context, seller),
-                    child: const Text('Accept',
-                        style: TextStyle(color: Colors.white)),
+                    onPressed: () => controller.approveSeller(context, seller),  // دايمًا مفعل
+                    child: const Text('Accept'),
                   ),
+
                   const SizedBox(width: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey,
-                      foregroundColor: Colors.white,
+
                       padding: const EdgeInsets.symmetric(
                           horizontal: 30, vertical: 12),
                       shape: RoundedRectangleBorder(

@@ -34,7 +34,7 @@ class _SearchBarViewState extends State<SearchBarView> {
         TextField(
           controller: _controller.textController,
           decoration: InputDecoration(
-            hintText: 'ابحث...',
+            hintText: 'Search...',
             hintStyle: TextStyle(color: burgundy.withAlpha(150)),
             prefixIcon: const Icon(Icons.search, color: burgundy),
             border: OutlineInputBorder(
@@ -88,7 +88,7 @@ class _SearchBarViewState extends State<SearchBarView> {
               : const Padding(
             padding: EdgeInsets.all(8),
             child: Text(
-              'لا توجد عناصر مطابقة',
+              'No matching items found',
               style: TextStyle(color: burgundy, fontSize: 16),
             ),
           ),

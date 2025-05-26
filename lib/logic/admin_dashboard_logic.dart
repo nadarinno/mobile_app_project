@@ -2,7 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AdminDashboardLogic {
   Stream<List<Map<String, dynamic>>> getSellersStream() {
-    return FirebaseFirestore.instance.collection('sellers').snapshots().map(
+    return FirebaseFirestore.instance
+        .collection('sellers')
+        .where('approved', isEqualTo: false)
+        .snapshots()
+        .map(
           (snapshot) => snapshot.docs.map((doc) {
         final data = doc.data();
         return {

@@ -11,6 +11,11 @@ import 'package:firebase_core/firebase_core.dart';
 // import 'order/order_management.dart';
 // import 'package:mobile_app_project/View/search_page_view.dart';
 import 'package:mobile_app_project/View/settings_view.dart';
+import 'package:mobile_app_project/logic/seller_detail_logic.dart';
+import 'package:mobile_app_project/view/seller_detail_view.dart';
+import 'package:mobile_app_project/View/admin_dashboard_view.dart';
+import 'package:mobile_app_project/view/order_management_view.dart';
+import 'package:mobile_app_project/View/select_payment_view.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -36,10 +41,10 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+ @override
+ Widget build(BuildContext context) {
 
+   return MaterialApp(
 
       debugShowCheckedModeBanner: false,
       //home: const OrderManagementPage(),
@@ -55,11 +60,14 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-
-      home: SettingPage(
-        onLanguageChange: _changeLanguage,
-        currentLocale: _locale,
-      ),
+     home: SelectPaymentMethod(),
+     //home: AdminDashboardView(),
+     //home: const OrderManagementPage(),
+     //home: SellerDetailPage(seller: dummySeller),
+      // home: SettingPage(
+      //   onLanguageChange: _changeLanguage,
+      //   currentLocale: _locale,
+      // ),
     );
   }
 }

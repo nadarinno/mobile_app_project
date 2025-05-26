@@ -48,13 +48,13 @@ class SearchPageView extends StatelessWidget {
       stream: controller.getCategories(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Center(child: Text('فشل في تحميل الفئات'));
+          return const Center(child: Text('Failed to load categories'));
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('لا توجد فئات'));
+          return const Center(child: Text('There are no categories.'));
         }
         final categories = snapshot.data!;
         return GridView.builder(
@@ -68,7 +68,7 @@ class SearchPageView extends StatelessWidget {
           itemCount: categories.length,
           itemBuilder: (context, index) {
             final category = categories[index];
-            final title = category['title'] ?? 'بدون عنوان';
+            final title = category['title'] ?? 'Untitled';
             final image = category['image'] ?? '';
             return InkWell(
               onTap: () => controller.navigateToResults(context, '', title),

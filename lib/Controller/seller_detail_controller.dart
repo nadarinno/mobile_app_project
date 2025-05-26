@@ -1,7 +1,7 @@
 // controllers/seller_controller.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_app_project/logic//seller_detail_logic.dart';
+import 'package:mobile_app_project/logic/seller_detail_logic.dart';
 
 class SellerController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

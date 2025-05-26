@@ -56,7 +56,7 @@ class _ProductCardViewState extends State<ProductCardView> {
                   widget.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => const Center(
-                      child: Text('فشل تحميل الصورة',
+                      child: Text('Image upload failed',
                           style: TextStyle(color: Color(0xFF561C24)))),
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
@@ -65,6 +65,7 @@ class _ProductCardViewState extends State<ProductCardView> {
                 ),
               ),
             ),
+            const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(

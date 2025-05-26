@@ -51,13 +51,13 @@ class _ProductsViewState extends State<ProductsView> {
           ),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return const Center(child: Text('فشل في تحميل المنتجات'));
+              return const Center(child: Text('Failed to load products'));
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text('لا توجد منتجات'));
+              return const Center(child: Text('No products found'));
             }
 
             final products = snapshot.data!;
