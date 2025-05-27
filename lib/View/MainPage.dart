@@ -15,6 +15,7 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
+ 
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
@@ -26,6 +27,7 @@ class _MainPageState extends State<MainPage> {
     SavedPage(),
     CartPage(controller: CartController(),),
     //AccountPage(),
+ 
   ];
 
   void _onItemTapped(int index) {
@@ -37,7 +39,9 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+ 
       body: _pages[_currentIndex], // Show selected page
+ 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
@@ -47,35 +51,14 @@ class _MainPageState extends State<MainPage> {
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.favorite_border), label: 'Saved'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_cart), label: 'Cart'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle), label: 'Account'),
+ 
+          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Saved'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
         ],
       ),
     );
   }
 }
-
-
-
-// bottomNavigationBar: BottomNavigationBar(
-//   currentIndex: 3,
-//   type: BottomNavigationBarType.fixed,
-//   backgroundColor: const Color(0xFFFFFDF6),
-//   selectedItemColor: const Color(0xFF561C24),
-//   unselectedItemColor: const Color(0xFFD0B8A8),
-//   items: const [
-//     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-//     BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-//     BottomNavigationBarItem(
-//         icon: Icon(Icons.favorite_border), label: 'Saved'),
-//     BottomNavigationBarItem(
-//         icon: Icon(Icons.shopping_cart), label: 'Cart'),
-//     BottomNavigationBarItem(
-//         icon: Icon(Icons.account_circle), label: 'Account'),
-//   ],
-// ),
+ 
+ 

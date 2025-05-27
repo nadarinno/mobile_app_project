@@ -1,6 +1,9 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/View/ForgotPasswordPage.dart';
+ 
+import 'package:mobile_app_project/View/MainPage.dart';
+ 
 import 'package:mobile_app_project/View/SellerSignUp.dart';
 import 'package:mobile_app_project/View/SignUp.dart';
 import 'package:mobile_app_project/View//HomePage.dart';
@@ -25,7 +28,10 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+ 
+  Stripe.publishableKey = 'pk_test_51REziwRu9mJNce3BovFk0FriBdHQrZwKiPPqvX4cp39OdMDfAInn6BwmG5LZrJM31Rj75jii51Cqmrd1r0ScKtgS0078Zzd8op';
+  await Stripe.instance.applySettings();
+ 
 
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
@@ -55,10 +61,55 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: const Login(),
+ 
+
     );
   }
 }
+// import 'package:flutter/material.dart';
+// import 'package:flutter_localizations/flutter_localizations.dart'; /
 
-
-
-
+// import 'user_settings/settings.dart';
+//
+// void main() {
+//   runApp(const MyApp());
+// }
+//
+// class MyApp extends StatefulWidget {
+//   const MyApp({super.key});
+//
+//   @overridegit status
+//   State<MyApp> createState() => _MyAppState();
+// }
+//
+// class _MyAppState extends State<MyApp> {
+//   Locale _locale = const Locale('en');
+//
+//   void _changeLanguage(String languageCode) {
+//     setState(() {
+//       _locale = Locale(languageCode);
+//     });
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       locale: _locale,
+//       supportedLocales: const [
+//         Locale('en'),
+//         Locale('ar'),
+//       ],
+//       localizationsDelegates: const [
+//         GlobalMaterialLocalizations.delegate,
+//         GlobalWidgetsLocalizations.delegate,
+//         GlobalCupertinoLocalizations.delegate,
+//       ],
+//       home: SettingPage(
+//         onLanguageChange: _changeLanguage,
+//         currentLocale: _locale,
+//       ),
+//     );
+//   }
+// }
+ 
