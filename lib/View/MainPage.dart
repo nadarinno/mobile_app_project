@@ -1,0 +1,56 @@
+import 'package:flutter/material.dart';
+import 'package:mobile_app_project/Controller/CartController.dart';
+import 'package:mobile_app_project/View/HomePage.dart';
+import 'package:mobile_app_project/View/Login.dart';
+import 'package:mobile_app_project/View/NotificationPage.dart';
+import 'package:mobile_app_project/View/SavedPage.dart';
+import 'package:mobile_app_project/View/CartPage.dart';
+// import 'package:mobile_app_project/View/SearchPage.dart';
+// import 'package:mobile_app_project/View/AccountPage.dart';
+
+class MainPage extends StatefulWidget {
+  const MainPage({Key? key}) : super(key: key);
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+
+
+class _MainPageState extends State<MainPage> {
+  int _currentIndex = 0;
+
+  final List<Widget> _pages = [
+    HomePage(),
+    NotificationPage(),
+    SavedPage(),
+    CartPage(controller: CartController()),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: const Color(0xFFFFFDF6),
+        selectedItemColor: const Color(0xFF561C24),
+        unselectedItemColor: const Color(0xFFD0B8A8),
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Saved'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
+        ],
+      ),
+    );
+  }
+}
