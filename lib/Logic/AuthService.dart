@@ -122,6 +122,29 @@ class AuthService {
       return 'An error occurred: $e';
     }
   }
+  // Change password
+  Future<String?> changePassword({required String newPassword}) async {
+    try {
+      User? user = _auth.currentUser;
+      if (user == null) {
+        return 'No user is currently signed in.';
+      }
+      await user.updatePassword(newPassword);
+      return 'success';
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'requires-recent-login':
+          return 'Please log in again to change your password.';
+        case 'weak-password':
+          return 'The new password is too weak.';
+        default:
+          return 'Password change failed: ${e.message}';
+      }
+    } catch (e) {
+      return 'An error occurred: $e';
+    }
+  }
+
   // Get current user profile
   Future<Map<String, dynamic>?> getUserProfile() async {
     try {
@@ -136,8 +159,9 @@ class AuthService {
     }
   }
 
-  // Optional: Logout method
+  // Logout method
   Future<void> logout() async {
     await _auth.signOut();
   }
+
 }
