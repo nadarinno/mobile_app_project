@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -29,34 +28,41 @@ Color getColorFromName(String colorName) {
     case 'beige':
       return Colors.brown.shade100;
     default:
-      return Colors.grey;
+      return Colors.white; // Changed to white for better UI visibility
   }
 }
+
 Future<File?> pickImage() async {
   final ImagePicker picker = ImagePicker();
   final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
   if (pickedFile != null) {
+    print("Picked image: ${pickedFile.path} at ${DateTime.now()}");
     return File(pickedFile.path);
   }
+  print("No image selected at ${DateTime.now()}");
   return null;
 }
+
 Future<String> uploadImage(File image) async {
   try {
     final fileName = 'product_images/${DateTime.now().millisecondsSinceEpoch}.jpg';
     final ref = FirebaseStorage.instance.ref().child(fileName);
     final uploadTask = ref.putFile(image);
 
-    // Show upload progress
     uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
-      print('Upload progress: ${(snapshot.bytesTransferred / snapshot.totalBytes) * 100}%');
+      print('Upload progress: ${(snapshot.bytesTransferred / snapshot.totalBytes) * 100}% at ${DateTime.now()}');
     });
 
     final snapshot = await uploadTask.whenComplete(() {});
     final downloadUrl = await snapshot.ref.getDownloadURL();
+    print("Image uploaded, URL: $downloadUrl at ${DateTime.now()}");
+
+    if (!downloadUrl.startsWith('http')) {
+      throw Exception("Invalid download URL: $downloadUrl");
+    }
     return downloadUrl;
   } catch (e) {
-    print("Detailed upload error: $e");
-    throw Exception("Failed to upload image: $e");
+    print("Error uploading image: $e at ${DateTime.now()}");
+    throw e; // Fixed the missing expression after 'throw'
   }
 }
-

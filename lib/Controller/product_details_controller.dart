@@ -1,6 +1,10 @@
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Add Firebase Auth
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/Logic/product_details_logic.dart';
-
+import '../utils.dart' as utils;
+import 'package:mobile_app_project/View/Login.dart';
 class ProductDetailsController extends ChangeNotifier {
   int currentImageIndex = 0;
   bool isFavorite = false;
@@ -21,36 +25,72 @@ class ProductDetailsController extends ChangeNotifier {
 
   bool isLoading = true;
   final ProductDetailsLogic _logic = ProductDetailsLogic();
+  final TextEditingController reviewController = TextEditingController();
+
+  // Add Firebase Auth instance
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Check if user is authenticated
+  bool get isAuthenticated => _auth.currentUser != null;
 
   Future<void> fetchProductData(String productId) async {
+    print("Starting fetchProductData for productId: $productId at ${DateTime.now()}");
     isLoading = true;
     notifyListeners();
 
-    final data = await _logic.fetchProductData(productId);
+    try {
+      final data = await _logic.fetchProductData(productId);
+      print("Fetched product data: $data at ${DateTime.now()}");
 
-    imagePaths = data['imagePaths'] ?? [];
-    productName = data['productName'] ?? '';
-    productPrice = data['productPrice'] ?? 0.0;
-    productDescription = data['productDescription'] ?? '';
-    productReviews = data['productReviews'] ?? [];
-    availableColors = data['availableColors'] ?? ['Black', 'White'];
-    availableSizes = data['availableSizes'] ?? [];
-    this.productId = data['productId'] ?? '';
+      imagePaths = List<String>.from(data['imagePaths'] ?? [])
+          .where((img) => img.startsWith('http') && !img.contains('assets/'))
+          .toList();
+      if (imagePaths.isEmpty && (data['imagePaths']?.isNotEmpty ?? false)) {
+        print("Filtered invalid imagePaths: ${data['imagePaths']} at ${DateTime.now()}");
+      }
 
-    // Set initial selections only if lists are not empty
-    if (availableColors.isNotEmpty) {
-      selectedColor = availableColors[0];
+      productName = data['productName'] ?? 'Unknown Product';
+      productPrice = (data['productPrice'] ?? 0.0).toDouble();
+      productDescription = data['productDescription'] ?? 'No description available';
+      productReviews = List<String>.from(data['productReviews'] ?? []);
+      availableColors = List<String>.from(data['availableColors'] ?? ['Black', 'White']);
+      availableSizes = List<String>.from(data['availableSizes'] ?? ['S', 'M', 'L']);
+      this.productId = data['productId'] ?? '';
+
+      if (availableColors.isNotEmpty) {
+        selectedColor = availableColors.first;
+      }
+      if (availableSizes.isNotEmpty) {
+        selectedSize = availableSizes.first;
+      }
+
+      if (imagePaths.isEmpty) {
+        print("No valid image paths from Firestore, UI will use fallback at ${DateTime.now()}");
+      }
+    } catch (e) {
+      print("Error in fetchProductData: $e at ${DateTime.now()}");
+      imagePaths = [];
+    } finally {
+      isLoading = false;
+      print("Fetch completed, isLoading: $isLoading, productName: $productName at ${DateTime.now()}");
+      notifyListeners();
     }
-    if (availableSizes.isNotEmpty) {
-      selectedSize = availableSizes[0];
-    }
-
-    isLoading = false;
-    notifyListeners();
   }
 
   Future<void> addToCart(BuildContext context) async {
+    if (!isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please log in to add items to your cart'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+      return;
+    }
+
     try {
+      print("Adding to cart for productId: $productId at ${DateTime.now()}");
       await _logic.addToCart(
         productId: productId,
         productName: productName,
@@ -64,25 +104,138 @@ class ProductDetailsController extends ChangeNotifier {
       notifyListeners();
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Added to cart!'),
           duration: Duration(seconds: 2),
         ),
       );
 
-      // Reset after 2 seconds
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(const Duration(seconds: 2), () {
         isAddedToCart = false;
         notifyListeners();
       });
     } catch (e) {
+      print("Error in addToCart: $e at ${DateTime.now()}");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to add to cart'),
+          content: Text('Failed to add to cart: $e'),
           backgroundColor: Colors.red,
         ),
       );
     }
+  }
+
+  Future<void> submitReview(BuildContext context) async {
+    if (!isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please log in to submit a review'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+      return;
+    }
+
+    if (reviewController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a review'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    try {
+      print("Submitting review for productId: $productId at ${DateTime.now()}");
+      await _logic.submitReview(
+        productId: productId,
+        reviewText: reviewController.text,
+      );
+
+      // Fetch updated product data, including reviews from the subcollection
+      final data = await _logic.fetchProductData(productId);
+      productReviews = List<String>.from(data['productReviews'] ?? []);
+
+      reviewController.clear();
+      notifyListeners();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Review submitted successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } on FirebaseException catch (e) {
+      print("Firebase error in submitReview: $e at ${DateTime.now()}");
+      String message = 'Failed to submit review';
+      if (e.code == 'permission-denied') {
+        message = 'You do not have permission to submit reviews';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
+      );
+    } catch (e) {
+      print("Unexpected error in submitReview: $e at ${DateTime.now()}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An unexpected error occurred'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  Future<void> uploadProductImage(BuildContext context) async {
+    if (!isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please log in to upload images'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+      return;
+    }
+
+    try {
+      final File? imageFile = await utils.pickImage();
+      if (imageFile == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No image selected'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final imageUrl = await utils.uploadImage(imageFile);
+      print("Image uploaded successfully: $imageUrl at ${DateTime.now()}");
+
+      if (!imageUrl.startsWith('http') || imageUrl.contains('assets/')) {
+        throw Exception('Invalid image URL received: $imageUrl');
+      }
+
+      imagePaths.add(imageUrl);
+      await _logic.updateProductImages(productId, imagePaths);
+
+      notifyListeners();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Image added successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      print("Error uploading product image: $e at ${DateTime.now()}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to add image: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Color getColorFromName(String colorName) {
+    return utils.getColorFromName(colorName);
   }
 
   void toggleFavorite() {
@@ -92,16 +245,6 @@ class ProductDetailsController extends ChangeNotifier {
 
   void setCurrentImageIndex(int index) {
     currentImageIndex = index;
-    notifyListeners();
-  }
-
-  void toggleDescription() {
-    showDescription = !showDescription;
-    notifyListeners();
-  }
-
-  void toggleReviews() {
-    showReviews = !showReviews;
     notifyListeners();
   }
 
@@ -115,31 +258,9 @@ class ProductDetailsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Color getColorFromName(String colorName) {
-    try {
-      String normalized = colorName.replaceAll('"', '').trim().toLowerCase();
-      print("Converting color: $normalized");
-
-      switch (normalized) {
-        case 'white':
-          return Colors.white;
-        case 'black':
-          return Colors.black;
-        case 'red':
-          return Colors.red;
-        case 'blue':
-          return Colors.blue;
-        case 'green':
-          return Colors.green;
-        case 'pink':
-          return Colors.pink;
-        default:
-          print("Unknown color: $normalized, using grey");
-          return Colors.grey;
-      }
-    } catch (e) {
-      print("Error in getColorFromName: $e");
-      return Colors.grey;
-    }
+  @override
+  void dispose() {
+    reviewController.dispose();
+    super.dispose();
   }
 }
