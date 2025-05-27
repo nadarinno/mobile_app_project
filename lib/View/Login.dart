@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-
 import 'MainPage.dart';
-
 import 'package:mobile_app_project/View/SellerSignUp.dart';
 import 'ForgotPasswordPage.dart';
-import 'package:mobile_app_project/Controller/LoginController.dart';
 import 'SignUp.dart';
+import 'package:mobile_app_project/View/HomePage.dart';
+import 'SellerSignUp.dart';
+import 'ForgotPasswordPage.dart';
+import 'package:mobile_app_project/Controller/LoginController.dart';
+ 
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -31,7 +33,11 @@ class _LoginState extends State<Login> {
       if (result == 'success') {
         Navigator.pushReplacement(
           context,
+ 
           MaterialPageRoute(builder: (context) => const MainPage()),
+ 
+           
+ 
         );
       }
     }
@@ -193,4 +199,7 @@ class _LoginState extends State<Login> {
       ),
     );
   }
+ 
 }
+ 
+ 

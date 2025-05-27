@@ -15,16 +15,19 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-
-
+ 
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
+  // List of pages for the bottom nav
   final List<Widget> _pages = [
     HomePage(),
+    //SearchPage(),
     NotificationPage(),
     SavedPage(),
-    CartPage(controller: CartController()),
+    CartPage(controller: CartController(),),
+    //AccountPage(),
+ 
   ];
 
   void _onItemTapped(int index) {
@@ -36,7 +39,9 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
+ 
+      body: _pages[_currentIndex], // Show selected page
+ 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
@@ -46,6 +51,7 @@ class _MainPageState extends State<MainPage> {
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+ 
           BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
           BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Saved'),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
@@ -54,3 +60,5 @@ class _MainPageState extends State<MainPage> {
     );
   }
 }
+ 
+ 
