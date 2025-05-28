@@ -1,6 +1,7 @@
 // views/product_card_view.dart
 import 'package:flutter/material.dart';
 import '../Controller/product_card_controller.dart';
+import 'package:mobile_app_project/View/product_details_page.dart';
 
 class ProductCardView extends StatefulWidget {
   final String productName;
@@ -33,9 +34,17 @@ class _ProductCardViewState extends State<ProductCardView> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 250,
-      width: 180,
+    return GestureDetector(
+        onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProductDetailsPage(productId: widget.productId),
+        ),
+      );
+     },
+     child: SizedBox(
+     width: 180,
       child: Card(
         color: const Color(0xFFFFFDF6),
         elevation: 1,
@@ -56,8 +65,9 @@ class _ProductCardViewState extends State<ProductCardView> {
                   widget.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => const Center(
-                      child: Text('Image upload failed',
-                          style: TextStyle(color: Color(0xFF561C24)))),
+                    child: Text('Image upload failed',
+                        style: TextStyle(color: Color(0xFF561C24))),
+                  ),
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return const Center(child: CircularProgressIndicator());
@@ -65,27 +75,30 @@ class _ProductCardViewState extends State<ProductCardView> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                widget.productName,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
+            const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text(
-                '\$${widget.price.toStringAsFixed(2)}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: widget.priceColor,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.productName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '\$${widget.price.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: widget.priceColor,
+                    ),
+                  ),
+                ],
               ),
             ),
             const Spacer(),
@@ -113,6 +126,9 @@ class _ProductCardViewState extends State<ProductCardView> {
           ],
         ),
       ),
+
+     ),
     );
   }
+
 }

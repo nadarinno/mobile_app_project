@@ -16,7 +16,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:mobile_app_project/View/CartPage.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
+import 'package:mobile_app_project/View/search_page_view.dart';
+import 'package:mobile_app_project/View/splash_screen.dart';
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 FlutterLocalNotificationsPlugin();
 
@@ -26,8 +27,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  Stripe.publishableKey = 'pk_test_51REziwRu9mJNce3BovFk0FriBdHQrZwKiPPqvX4cp39OdMDfAInn6BwmG5LZrJM31Rj75jii51Cqmrd1r0ScKtgS0078Zzd8op';
-  await Stripe.instance.applySettings();
+  //Stripe.publishableKey = 'pk_test_51REziwRu9mJNce3BovFk0FriBdHQrZwKiPPqvX4cp39OdMDfAInn6BwmG5LZrJM31Rj75jii51Cqmrd1r0ScKtgS0078Zzd8op';
+  //await Stripe.instance.applySettings();
 
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
@@ -56,7 +57,7 @@ class MyApp extends StatelessWidget {
 
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const Login(),
+      home: const SplashScreen(),
 
     );
   }
