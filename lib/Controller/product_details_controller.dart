@@ -1,16 +1,15 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Add Firebase Auth
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/Logic/product_details_logic.dart';
-import '../utils.dart' as utils;
 import 'package:mobile_app_project/View/Login.dart';
+import '../utils.dart' as utils;
+
 class ProductDetailsController extends ChangeNotifier {
   int currentImageIndex = 0;
   bool isFavorite = false;
   bool isAddedToCart = false;
-  bool showDescription = false;
-  bool showReviews = false;
   String selectedColor = 'Black';
   String selectedSize = 'M';
 
@@ -18,19 +17,14 @@ class ProductDetailsController extends ChangeNotifier {
   String productName = '';
   double productPrice = 0.0;
   String productDescription = '';
-  List<String> productReviews = [];
   List<String> availableColors = [];
   List<String> availableSizes = [];
   String productId = '';
 
   bool isLoading = true;
   final ProductDetailsLogic _logic = ProductDetailsLogic();
-  final TextEditingController reviewController = TextEditingController();
-
-  // Add Firebase Auth instance
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Check if user is authenticated
   bool get isAuthenticated => _auth.currentUser != null;
 
   Future<void> fetchProductData(String productId) async {
@@ -52,7 +46,6 @@ class ProductDetailsController extends ChangeNotifier {
       productName = data['productName'] ?? 'Unknown Product';
       productPrice = (data['productPrice'] ?? 0.0).toDouble();
       productDescription = data['productDescription'] ?? 'No description available';
-      productReviews = List<String>.from(data['productReviews'] ?? []);
       availableColors = List<String>.from(data['availableColors'] ?? ['Black', 'White']);
       availableSizes = List<String>.from(data['availableSizes'] ?? ['S', 'M', 'L']);
       this.productId = data['productId'] ?? '';
@@ -121,62 +114,6 @@ class ProductDetailsController extends ChangeNotifier {
           content: Text('Failed to add to cart: $e'),
           backgroundColor: Colors.red,
         ),
-      );
-    }
-  }
-
-  Future<void> submitReview(BuildContext context) async {
-    if (!isAuthenticated) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please log in to submit a review'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
-      return;
-    }
-
-    if (reviewController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a review'), backgroundColor: Colors.red),
-      );
-      return;
-    }
-
-    try {
-      print("Submitting review for productId: $productId at ${DateTime.now()}");
-      await _logic.submitReview(
-        productId: productId,
-        reviewText: reviewController.text,
-      );
-
-      // Fetch updated product data, including reviews from the subcollection
-      final data = await _logic.fetchProductData(productId);
-      productReviews = List<String>.from(data['productReviews'] ?? []);
-
-      reviewController.clear();
-      notifyListeners();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Review submitted successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } on FirebaseException catch (e) {
-      print("Firebase error in submitReview: $e at ${DateTime.now()}");
-      String message = 'Failed to submit review';
-      if (e.code == 'permission-denied') {
-        message = 'You do not have permission to submit reviews';
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.red),
-      );
-    } catch (e) {
-      print("Unexpected error in submitReview: $e at ${DateTime.now()}");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An unexpected error occurred'), backgroundColor: Colors.red),
       );
     }
   }
@@ -256,11 +193,5 @@ class ProductDetailsController extends ChangeNotifier {
   void setSelectedSize(String size) {
     selectedSize = size;
     notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    reviewController.dispose();
-    super.dispose();
   }
 }

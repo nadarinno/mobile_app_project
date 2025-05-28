@@ -34,17 +34,6 @@ class ProductDetailsLogic {
         print("No valid HTTP image URLs found for productId: $productId at ${DateTime.now()}");
       }
 
-      // Fetch reviews from the subcollection
-      List<String> reviews = [];
-      final reviewsSnapshot = await FirebaseFirestore.instance
-          .collection('products')
-          .doc(productId)
-          .collection('reviews')
-          .orderBy('timestamp', descending: true) // Optional: Sort by timestamp
-          .get();
-      reviews = reviewsSnapshot.docs.map((doc) => doc['text'] as String).toList();
-      print("Fetched ${reviews.length} reviews for productId $productId at ${DateTime.now()}");
-
       String name = data['name'] ?? data['(name'] ?? 'Unknown Product';
 
       List<String> colors = [];
@@ -66,7 +55,6 @@ class ProductDetailsLogic {
         'productName': name,
         'productPrice': (data['price'] is num ? data['price'].toDouble() : 0.0),
         'productDescription': data['description']?.toString() ?? 'No description available',
-        'productReviews': reviews, // Now fetched from subcollection
         'availableColors': colors,
         'availableSizes': sizes,
         'productId': productId,
@@ -103,35 +91,13 @@ class ProductDetailsLogic {
         'imagePaths': imagePaths,
         'selectedColor': selectedColor,
         'selectedSize': selectedSize,
-        'quantity': 1, // Add quantity field as required by rules
+        'quantity': 1,
         'addedAt': FieldValue.serverTimestamp(),
       });
       print("Successfully added to cart for productId: $productId at ${DateTime.now()}");
     } catch (e) {
       print("Error adding to cart: $e at ${DateTime.now()}");
       throw Exception("Failed to add to cart: $e");
-    }
-  }
-
-  Future<void> submitReview({
-    required String productId,
-    required String reviewText,
-  }) async {
-    try {
-      print("Submitting review for productId: $productId at ${DateTime.now()}");
-      await FirebaseFirestore.instance
-          .collection('products')
-          .doc(productId)
-          .collection('reviews') // Write to the reviews subcollection
-          .add({
-        'text': reviewText,
-        'userId': FirebaseAuth.instance.currentUser?.uid ?? 'anonymous',
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-      print("Review submitted successfully for productId: $productId at ${DateTime.now()}");
-    } catch (e) {
-      print("Error submitting review: $e at ${DateTime.now()}");
-      throw Exception("Failed to submit review: $e");
     }
   }
 

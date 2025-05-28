@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/Controller/product_details_controller.dart';
+import 'package:mobile_app_project/View/reviews_page.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final String productId;
@@ -17,9 +18,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   void initState() {
     super.initState();
     _controller = ProductDetailsController();
-    print("Initiating fetch for productId: ${widget.productId} at ${DateTime.now()}");
     _controller.fetchProductData(widget.productId).catchError((e) {
-      print("Error in initState: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load product: $e'), backgroundColor: Colors.red),
       );
@@ -35,7 +34,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   }
 
   void _updateState() {
-    print("UI updated - isLoading: ${_controller.isLoading}, productName: ${_controller.productName} at ${DateTime.now()}");
     setState(() {});
   }
 
@@ -83,12 +81,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("Building UI - isLoading: ${_controller.isLoading}, productName: ${_controller.productName}, imagePaths: ${_controller.imagePaths} at ${DateTime.now()}");
-
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
-    // Early return for loading
     if (_controller.isLoading) {
       return Scaffold(
         backgroundColor: Colors.white,
@@ -96,7 +91,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       );
     }
 
-    // Early return for failure
     if (_controller.productName.isEmpty) {
       return Scaffold(
         backgroundColor: Colors.white,
@@ -115,7 +109,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       );
     }
 
-    // Main UI
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -135,33 +128,21 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           onPageChanged: (index) => _controller.setCurrentImageIndex(index),
                           itemBuilder: (context, index) {
                             final imagePath = _controller.imagePaths[index];
-                            print("Rendering image: $imagePath at ${DateTime.now()}");
                             if (imagePath.startsWith('http')) {
                               return Image.network(
                                 imagePath,
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 errorBuilder: (context, error, stackTrace) {
-                                  print("Error loading network image: $imagePath - $error at ${DateTime.now()}");
-                                  return Image.asset(
-                                    'assets/images/cozyshoplogo.png',
-                                    fit: BoxFit.cover,
-                                  );
+                                  return Image.asset('assets/images/cozyshoplogo.png', fit: BoxFit.cover);
                                 },
                               );
                             } else {
-                              print("Invalid URL, using fallback asset for: $imagePath at ${DateTime.now()}");
-                              return Image.asset(
-                                'assets/images/cozyshoplogo.png',
-                                fit: BoxFit.cover,
-                              );
+                              return Image.asset('assets/images/cozyshoplogo.png', fit: BoxFit.cover);
                             }
                           },
                         )
-                            : Image.asset(
-                          'assets/images/cozyshoplogo.png',
-                          fit: BoxFit.cover,
-                        ),
+                            : Image.asset('assets/images/cozyshoplogo.png', fit: BoxFit.cover),
                       ),
                       Positioned(
                         top: height * 0.02,
@@ -214,7 +195,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   ),
                 ),
 
-                // PRODUCT INFO SECTION
+                // PRODUCT INFO
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.all(width * 0.05),
@@ -222,7 +203,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _controller.productName.isNotEmpty ? _controller.productName : 'Unknown Product',
+                          _controller.productName,
                           style: TextStyle(
                             fontSize: width * 0.06,
                             fontWeight: FontWeight.bold,
@@ -240,10 +221,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                         SizedBox(height: height * 0.015),
                         Text(
-                          _controller.productDescription.isNotEmpty ? _controller.productDescription : 'No description available',
+                          _controller.productDescription.isNotEmpty
+                              ? _controller.productDescription
+                              : 'No description available',
                           style: TextStyle(
-                            fontSize: width * 0.04,
+                            fontSize: width * 0.035,
                             color: Colors.grey[700],
+                            height: 1.4,
                           ),
                         ),
                         SizedBox(height: height * 0.03),
@@ -252,7 +236,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   ),
                 ),
 
-                // COLORS SECTION
+                // COLORS
                 if (_controller.availableColors.isNotEmpty)
                   SliverToBoxAdapter(
                     child: Padding(
@@ -276,7 +260,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     ),
                   ),
 
-                // SIZES SECTION
+                // SIZES
                 if (_controller.availableSizes.isNotEmpty)
                   SliverToBoxAdapter(
                     child: Padding(
@@ -301,48 +285,41 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 // REVIEWS SECTION
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: width * 0.05),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Reviews",
-                          style: TextStyle(fontSize: width * 0.045, fontWeight: FontWeight.w600),
-                        ),
-                        SizedBox(height: height * 0.01),
-                        TextField(
-                          controller: _controller.reviewController,
-                          decoration: InputDecoration(
-                            hintText: "Write a review...",
-                            border: OutlineInputBorder(),
+                    padding: EdgeInsets.only(top: height * 0.015),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ReviewsPage(productId: widget.productId),
                           ),
-                          maxLines: 3,
-                        ),
-                        SizedBox(height: height * 0.01),
-                        ElevatedButton(
-                          onPressed: () => _controller.submitReview(context),
-                          child: const Text("Submit Review"),
-                        ),
-                        SizedBox(height: height * 0.02),
-                        if (_controller.productReviews.isNotEmpty)
-                          ..._controller.productReviews.map((review) => Padding(
-                            padding: EdgeInsets.symmetric(vertical: height * 0.01),
-                            child: Text(
-                              review,
-                              style: TextStyle(fontSize: width * 0.04, color: Colors.grey[700]),
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: width * 0.05, vertical: height * 0.02),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Reviews",
+                              style: TextStyle(
+                                fontSize: width * 0.045,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
                             ),
-                          ))
-                        else
-                          Text(
-                            "No reviews yet.",
-                            style: TextStyle(fontSize: width * 0.04, color: Colors.grey[700]),
-                          ),
-                      ],
+                            Icon(Icons.chevron_right, size: width * 0.06, color: Colors.black),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
+                SliverToBoxAdapter(child: SizedBox(height: height * 0.1)),
               ],
             ),
+
+            // BOTTOM BAR
             Positioned(
               bottom: 0,
               left: 0,
