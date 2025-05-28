@@ -1,20 +1,17 @@
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../utils.dart' as utils;
-
-
 class EditProductLogic {
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController;
   final TextEditingController priceController;
   final TextEditingController quantityController;
   final TextEditingController descriptionController;
-  final TextEditingController colorController = TextEditingController();
-  List<String> selectedColors;
-  final List<String> availableColors = ['Red', 'Blue', 'Green', 'Black', 'White', 'Yellow', 'Purple', 'Orange', 'Pink'];
-  File? imageFile;
+  final TextEditingController colorController;
+  final List<String> selectedColors;
+  final List<String> availableColors;
+  List<File> imageFiles;
+  List<String> existingImages;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   EditProductLogic({
     required String initialName,
@@ -22,45 +19,61 @@ class EditProductLogic {
     required String initialQuantity,
     required String initialDescription,
     required List<String> initialColors,
-  })  : nameController = TextEditingController(text: initialName),
-        priceController = TextEditingController(text: initialPrice),
-        quantityController = TextEditingController(text: initialQuantity),
-        descriptionController = TextEditingController(text: initialDescription),
-        selectedColors = initialColors;
+  }) : nameController = TextEditingController(text: initialName),
+       priceController = TextEditingController(text: initialPrice),
+       quantityController = TextEditingController(text: initialQuantity),
+       descriptionController = TextEditingController(text: initialDescription),
+       colorController = TextEditingController(),
+       selectedColors = List.from(initialColors),
+       availableColors = [
+         'Red',
+         'Blue',
+         'Green',
+         'Yellow',
+         'Purple',
+         'Orange',
+         'Pink',
+         'Black',
+         'White',
+       ],
+       imageFiles = [],
+       existingImages = [];
 
   String? validateName(String? value) {
-    return value == null || value.isEmpty ? 'Please enter a product name' : null;
+    if (value == null || value.isEmpty) {
+      return 'Please enter a product name';
+    }
+    return null;
   }
 
   String? validatePrice(String? value) {
-    if (value == null || value.isEmpty) return 'Please enter a price';
-    if (double.tryParse(value) == null) return 'Please enter a valid number';
-    if (double.parse(value) <= 0) return 'Price must be greater than 0';
+    if (value == null || value.isEmpty) {
+      return 'Please enter a price';
+    }
+    final price = double.tryParse(value);
+    if (price == null || price <= 0) {
+      return 'Please enter a valid price';
+    }
     return null;
   }
 
   String? validateQuantity(String? value) {
-    if (value == null || value.isEmpty) return 'Please enter a quantity';
-    if (int.tryParse(value) == null) return 'Please enter a valid whole number';
-    if (int.parse(value) < 0) return 'Quantity cannot be negative';
+    if (value == null || value.isEmpty) {
+      return 'Please enter a quantity';
+    }
+    final quantity = int.tryParse(value);
+    if (quantity == null || quantity < 0) {
+      return 'Please enter a valid quantity';
+    }
     return null;
   }
 
   void addColor() {
-    String color = colorController.text.trim();
-    if (color.isNotEmpty && !selectedColors.any((c) => c.toLowerCase() == color.toLowerCase())) {
-      selectedColors.removeWhere((c) => c.toLowerCase() == color.toLowerCase());
+    final color = colorController.text.trim();
+    if (color.isNotEmpty &&
+        !selectedColors.any((c) => c.toLowerCase() == color.toLowerCase())) {
       selectedColors.add(color);
       colorController.clear();
-    }
-  }
-
-  void toggleColor(String color, bool selected) {
-    if (selected) {
-      selectedColors.removeWhere((c) => c.toLowerCase() == color.toLowerCase());
-      selectedColors.add(color);
-    } else {
-      selectedColors.removeWhere((c) => c.toLowerCase() == color.toLowerCase());
     }
   }
 
@@ -68,23 +81,36 @@ class EditProductLogic {
     selectedColors.remove(color);
   }
 
+  void toggleColor(String color, bool selected) {
+    if (selected) {
+      if (!selectedColors.any((c) => c.toLowerCase() == color.toLowerCase())) {
+        selectedColors.add(color);
+      }
+    } else {
+      selectedColors.removeWhere((c) => c.toLowerCase() == color.toLowerCase());
+    }
+  }
+
   Future<void> pickImage() async {
-    imageFile = await utils.pickImage();
+    // Placeholder: Implement image picking logic (e.g., using image_picker package)
+    // For example:
+    // final picker = ImagePicker();
+    // final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    // if (pickedFile != null) {
+    //   imageFiles.add(File(pickedFile.path));
+    // }
   }
 
-  void removeImage() {
-    imageFile = null;
+  void removeImage(int index) {
+    imageFiles.removeAt(index);
   }
 
-  Map<String, dynamic> getUpdatedProduct() {
-    return {
-      'name': nameController.text,
-      'price': double.tryParse(priceController.text) ?? 0.0,
-      'quantity': int.tryParse(quantityController.text) ?? 0,
-      'description': descriptionController.text,
-      'colors': selectedColors,
-      'createdAt': FieldValue.serverTimestamp(),
-    };
+  void removeExistingImage(int index) {
+    existingImages.removeAt(index);
+  }
+
+  void setExistingImages(List<String> images) {
+    existingImages = List.from(images);
   }
 
   void dispose() {
