@@ -5,7 +5,10 @@ import 'ForgotPasswordPage.dart';
 import 'package:mobile_app_project/Controller/LoginController.dart';
 import 'SignUp.dart';
 import 'package:mobile_app_project/View/admin_dashboard_view.dart';
-
+import 'package:mobile_app_project/View/seller_dashboard_view.dart';
+import 'package:mobile_app_project/Controller/seller_dashboard_controller.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mobile_app_project/Logic/seller_dashboard_logic.dart';
 class Login extends StatefulWidget {
   const Login({super.key});
 
@@ -29,10 +32,21 @@ class _LoginState extends State<Login> {
 
       if (result != null && result['status'] == 'success') {
         final role = result['role']?.toLowerCase();
+
         if (role == 'admin') {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => AdminDashboardView()),
+          );
+        } else if (role == 'seller') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SellerDashboardView(
+                controller: SellerDashboardController(FirebaseFirestore.instance),
+                logic: SellerDashboardLogic(),
+              ),
+            ),
           );
         } else {
           Navigator.pushReplacement(
@@ -43,6 +57,7 @@ class _LoginState extends State<Login> {
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
