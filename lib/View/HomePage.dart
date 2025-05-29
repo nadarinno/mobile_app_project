@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobile_app_project/View/Login.dart';
-import 'package:mobile_app_project/View/NotificationPage.dart';
 import 'package:mobile_app_project/Controller/HomePageController.dart';
 import 'package:mobile_app_project/View/product_details_page.dart';
+import 'package:mobile_app_project/View/NotificationPage.dart';
+import 'package:mobile_app_project/View/SavedPage.dart';
+import 'package:mobile_app_project/View/cart_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Function(int)? onNavigate;
+
+  const HomePage({super.key, this.onNavigate});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -15,6 +19,27 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final HomePageController controller = HomePageController();
   final int notificationCount = 5; // Example notification count
+  int _currentIndex = 0; // Local index for BottomNavigationBar when standalone
+
+  // Pages for standalone navigation
+  final List<Widget> _pages = [
+    const HomePage(),
+    const NotificationPage(),
+    const SavedPage(),
+    const CartPage(),
+  ];
+
+  void _onItemTapped(int index) {
+    if (widget.onNavigate != null) {
+      // If used within MainPage, delegate to MainPage's navigation
+      widget.onNavigate!(index);
+    } else {
+      // Handle navigation locally when standalone
+      setState(() {
+        _currentIndex = index;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +53,51 @@ class _HomePageState extends State<HomePage> {
       return const Center(child: Text('Redirecting to login...'));
     }
 
+    // If onNavigate is provided, return just the content (used in MainPage)
+    if (widget.onNavigate != null) {
+      return HomePageContent(
+        controller: controller,
+        notificationCount: notificationCount,
+        onNavigate: _onItemTapped,
+      );
+    }
+
+    // If standalone, include BottomNavigationBar
+    return Scaffold(
+      body: _pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: const Color(0xFFFFFDF6),
+        selectedItemColor: const Color(0xFF561C24),
+        unselectedItemColor: const Color(0xFFD0B8A8),
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Saved'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
+        ],
+      ),
+    );
+  }
+}
+
+// Extracted HomePage content to a separate widget for reusability
+class HomePageContent extends StatelessWidget {
+  final HomePageController controller;
+  final int notificationCount;
+  final Function(int) onNavigate;
+
+  const HomePageContent({
+    super.key,
+    required this.controller,
+    required this.notificationCount,
+    required this.onNavigate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: Padding(
@@ -54,16 +124,8 @@ class _HomePageState extends State<HomePage> {
                   Icons.notifications,
                   color: Color(0xFF561C24),
                 ),
-                onPressed: () async {
-                  try {
-                    await Future.delayed(const Duration(milliseconds: 500));
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const NotificationPage()),
-                    );
-                  } catch (e) {
-                    print('Error navigating to NotificationPage: $e');
-                  }
+                onPressed: () {
+                  onNavigate(1); // Navigate to Notifications (index 1)
                 },
               ),
               if (notificationCount > 0)

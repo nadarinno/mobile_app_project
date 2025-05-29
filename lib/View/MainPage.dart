@@ -1,12 +1,10 @@
+// lib/View/MainPage.dart
 import 'package:flutter/material.dart';
-import 'package:mobile_app_project/Controller/CartController.dart';
 import 'package:mobile_app_project/View/HomePage.dart';
-import 'package:mobile_app_project/View/Login.dart';
 import 'package:mobile_app_project/View/NotificationPage.dart';
 import 'package:mobile_app_project/View/SavedPage.dart';
-import 'package:mobile_app_project/View/CartPage.dart';
-// import 'package:mobile_app_project/View/SearchPage.dart';
-// import 'package:mobile_app_project/View/AccountPage.dart';
+import 'package:mobile_app_project/View/cart_page.dart';
+import 'package:mobile_app_project/widgets/bottom_nav_bar.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -15,16 +13,14 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-
-
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    HomePage(),
-    NotificationPage(),
-    SavedPage(),
-    CartPage(controller: CartController()),
+    const HomePage(),
+    const NotificationPage(),
+    const SavedPage(),
+    const CartPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -36,20 +32,13 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _pages,
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFFFFFDF6),
-        selectedItemColor: const Color(0xFF561C24),
-        unselectedItemColor: const Color(0xFFD0B8A8),
         onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Saved'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
-        ],
       ),
     );
   }
