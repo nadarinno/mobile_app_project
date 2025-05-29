@@ -1,5 +1,6 @@
-// lib/View/MainPage.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:mobile_app_project/Controller/cart_controller.dart';
 import 'package:mobile_app_project/View/HomePage.dart';
 import 'package:mobile_app_project/View/NotificationPage.dart';
 import 'package:mobile_app_project/View/SavedPage.dart';
@@ -15,27 +16,33 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
+  late final List<Widget> _pages;
 
-  final List<Widget> _pages = [
-    const HomePage(),
-    const NotificationPage(),
-    const SavedPage(),
-    const CartPage(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+
+    _pages = [
+      HomePage(onNavigate: _onItemTapped),
+      const NotificationPage(),
+      CartPage(controller: context.read<CartController>()),
+      const SavedPage(),
+      const NotificationPage(),
+    ];
+  }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    if (index >= 0 && index < _pages.length) {
+      setState(() {
+        _currentIndex = index;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _currentIndex,
         onTap: _onItemTapped,
