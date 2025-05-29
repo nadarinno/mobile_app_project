@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'MainPage.dart';
+
 import 'package:mobile_app_project/View/SellerSignUp.dart';
 import 'ForgotPasswordPage.dart';
 import 'package:mobile_app_project/Controller/LoginController.dart';
@@ -57,7 +59,6 @@ class _LoginState extends State<Login> {
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
