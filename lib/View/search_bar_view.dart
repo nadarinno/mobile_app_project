@@ -1,4 +1,4 @@
-// views/search_bar_view.dart
+
 import 'package:flutter/material.dart';
 import '../Controller/search_controller.dart';
 

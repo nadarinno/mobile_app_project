@@ -58,34 +58,3 @@ class _MainPageState extends State<MainPage> {
     );
   }
 }
-// class _MyAppState extends State<MyApp> {
-//   Locale _locale = const Locale('en');
-//
-//   void _changeLanguage(String languageCode) {
-//     setState(() {
-//        class _MyAppState extends State<MyApp> {
-//       @override
-//       Widget build(BuildContext context) {
-//       return MaterialApp(
-//
-//
-//       debugShowCheckedModeBanner: false,
-//       locale: _locale,
-//
-//
-//
-//       supportedLocales: const [
-//       Locale('en'),
-//       Locale('ar'),
-//       class _MyAppState extends State<MyApp> {
-//       GlobalWidgetsLocalizations.delegate,
-//       GlobalCupertinoLocalizations.delegate,
-//       ],
-//
-//       home: SettingPage(
-//       onLanguageChange: _changeLanguage,
-//       currentLocale: _locale,
-//       ),
-//       );
-//       }
-//       }

@@ -14,7 +14,7 @@ class SellerDashboardView extends StatefulWidget {
   final SellerDashboardController controller;
   final SellerDashboardLogic logic;
 
-  SellerDashboardView({required this.controller, required this.logic});
+  const SellerDashboardView({super.key, required this.controller, required this.logic});
 
   @override
   _SellerDashboardViewState createState() => _SellerDashboardViewState();

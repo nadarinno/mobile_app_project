@@ -7,7 +7,7 @@ import 'package:mobile_app_project/view/login.dart';
 class AdminDashboardView extends StatelessWidget {
   final AdminDashboardController controller = AdminDashboardController(AdminDashboardLogic());
 
-  AdminDashboardView({Key? key}) : super(key: key);
+  AdminDashboardView({super.key});
 
   static const Color beige = Color(0xFFE5E1DA);
   static const Color burgundy = Color(0xFF561C24);

@@ -1,4 +1,4 @@
-// views/product_card_view.dart
+
 import 'package:flutter/material.dart';
 import '../Controller/product_card_controller.dart';
 import 'package:mobile_app_project/View/product_details_page.dart';

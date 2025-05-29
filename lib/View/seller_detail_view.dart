@@ -54,21 +54,21 @@ class SellerDetailPage extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-                        if (states.contains(MaterialState.disabled)) {
-                          return Color(0xFF561C24); // لون زر معطل بنفس اللون الخمري
+                      backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(WidgetState.disabled)) {
+                          return Color(0xFF561C24);
                         }
-                        return Color(0xFF561C24); // اللون العادي
+                        return Color(0xFF561C24);
                       }),
-                      foregroundColor: MaterialStateProperty.all(Colors.white),
-                      padding: MaterialStateProperty.all(
+                      foregroundColor: WidgetStateProperty.all(Colors.white),
+                      padding: WidgetStateProperty.all(
                         const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                       ),
-                      shape: MaterialStateProperty.all(
+                      shape: WidgetStateProperty.all(
                         RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                     ),
-                    onPressed: () => controller.approveSeller(context, seller),  // دايمًا مفعل
+                    onPressed: () => controller.approveSeller(context, seller),
                     child: const Text('Accept'),
                   ),
 
