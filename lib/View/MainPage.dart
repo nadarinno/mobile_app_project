@@ -5,8 +5,8 @@ import 'package:mobile_app_project/View/Login.dart';
 import 'package:mobile_app_project/View/NotificationPage.dart';
 import 'package:mobile_app_project/View/SavedPage.dart';
 import 'package:mobile_app_project/View/CartPage.dart';
-// import 'package:mobile_app_project/View/SearchPage.dart';
-// import 'package:mobile_app_project/View/AccountPage.dart';
+ import 'package:mobile_app_project/View/search_page_view.dart';
+import 'package:mobile_app_project/View/settings_view.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -15,19 +15,17 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
- 
+
+
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
-  // List of pages for the bottom nav
   final List<Widget> _pages = [
     HomePage(),
-    //SearchPage(),
-    NotificationPage(),
+    SearchPageView(),
     SavedPage(),
     CartPage(controller: CartController(),),
-    //AccountPage(),
- 
+    SettingPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -39,9 +37,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
- 
       body: _pages[_currentIndex], // Show selected page
- 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
@@ -51,14 +47,15 @@ class _MainPageState extends State<MainPage> {
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
- 
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Saved'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.favorite_border), label: 'Saved'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart), label: 'Cart'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle), label: 'Account'),
         ],
       ),
     );
   }
 }
- 
- 

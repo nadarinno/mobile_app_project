@@ -21,4 +21,11 @@ class AdminDashboardLogic {
       }).toList(),
     );
   }
+
+  Future<void> updateSellerStatus(String sellerId, bool status) async {
+    await FirebaseFirestore.instance
+        .collection('sellers')
+        .doc(sellerId)
+        .update({'approved': status});
+  }
 }

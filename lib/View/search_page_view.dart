@@ -1,4 +1,4 @@
-// views/search_page_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/View/search_bar_view.dart';
 import '../Controller/search_page_controller.dart';
@@ -12,7 +12,7 @@ class SearchPageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SearchPageController _controller = SearchPageController();
+    final SearchPageController controller = SearchPageController();
 
     return Scaffold(
       backgroundColor: beige,
@@ -33,10 +33,10 @@ class SearchPageView extends StatelessWidget {
         child: Column(
           children: [
             SearchBarView(
-              onSearch: (query) => _controller.navigateToResults(context, query),
+              onSearch: (query) => controller.navigateToResults(context, query),
             ),
             const SizedBox(height: 20),
-            Expanded(child: _buildCategories(context, _controller)),
+            Expanded(child: _buildCategories(context, controller)),
           ],
         ),
       ),

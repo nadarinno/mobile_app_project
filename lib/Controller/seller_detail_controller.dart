@@ -1,4 +1,4 @@
-// controllers/seller_controller.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/logic/seller_detail_logic.dart';
@@ -23,7 +23,7 @@ class SellerController {
     }
   }
 
-  // Reject (delete) a seller
+
   Future<void> rejectSeller(BuildContext context, Seller seller) async {
     try {
       await _firestore.collection('sellers').doc(seller.id).delete();

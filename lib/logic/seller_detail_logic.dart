@@ -19,7 +19,7 @@ class Seller {
     required this.approved,
   });
 
-  // Convert Firestore document to Seller object
+
   factory Seller.fromMap(Map<String, dynamic> data, String id) {
     return Seller(
       id: id,
@@ -32,7 +32,7 @@ class Seller {
     );
   }
 
-  // Convert Seller object to Firestore document
+
   Map<String, dynamic> toMap() {
     return {
       'name': name,

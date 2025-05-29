@@ -1,4 +1,4 @@
-// controllers/search_page_controller.dart
+
 import 'package:flutter/material.dart';
 import '../logic/category_logic.dart';
 import '../view/product_page_view.dart';

@@ -22,4 +22,7 @@ class AdminDashboardController {
   Stream<List<Map<String, dynamic>>> getSellersStream() {
     return logic.getSellersStream();
   }
+  Future<void> updateSellerStatus(String sellerId, bool status) {
+    return logic.updateSellerStatus(sellerId, status);
+  }
 }

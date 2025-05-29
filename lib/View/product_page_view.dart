@@ -1,4 +1,4 @@
-// views/products_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/Controller/product_page_controller.dart';
 import 'package:mobile_app_project/View/product_cart_view.dart';
@@ -20,7 +20,7 @@ class ProductsView extends StatefulWidget {
 
 class _ProductsViewState extends State<ProductsView> {
   static const Color burgundy = Color(0xFF561C24);
-  static const Color lightBurgundy = Color(0xFFFFFDF6);
+
   static const Color beige = Color(0xFFE5E1DA);
   final ProductsController _controller = ProductsController();
 

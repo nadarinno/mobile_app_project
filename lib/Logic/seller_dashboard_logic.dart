@@ -13,8 +13,9 @@ class SellerDashboardLogic {
     return StreamBuilder<QuerySnapshot>(
       stream: productsStream,
       builder: (context, snapshot) {
-        if (!snapshot.hasData)
+        if (!snapshot.hasData) {
           return Center(child: CircularProgressIndicator());
+        }
 
         final docs = snapshot.data!.docs;
         double totalSales = 0.0;
@@ -79,13 +80,15 @@ class SellerDashboardLogic {
     return StreamBuilder<QuerySnapshot>(
       stream: productsStream,
       builder: (context, snapshot) {
-        if (snapshot.hasError)
+        if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
+        }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }
-        if (snapshot.data!.docs.isEmpty)
+        if (snapshot.data!.docs.isEmpty) {
           return Center(child: Text("No products available"));
+        }
 
         final docs = snapshot.data!.docs;
 

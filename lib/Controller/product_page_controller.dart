@@ -1,4 +1,4 @@
-// controllers/products_controller.dart
+
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/logic/product_logic.dart';
 import 'package:mobile_app_project/Controller/product_card_controller.dart';

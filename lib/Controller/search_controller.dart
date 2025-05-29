@@ -1,4 +1,4 @@
-// controllers/search_controller.dart
+
 import 'package:flutter/material.dart';
 import '../logic/search_logic.dart';
 

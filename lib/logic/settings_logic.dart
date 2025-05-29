@@ -1,4 +1,3 @@
-// logic/settings_logic.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +38,6 @@ class SettingsLogic {
         'email': userData['email']?.trim() ?? '',
         'phone': userData['phone']?.trim() ?? '',
         'location': userData['location']?.trim() ?? '',
-        'language': userData['language'] ?? 'en',
         'notificationsEnabled': userData['notificationsEnabled'] ?? true,
       });
       print('✔️ Profile updated for user: $uid');
@@ -56,7 +54,7 @@ class SettingsLogic {
       if (uid == null) return false;
       await _firestore.collection('users').doc(uid).delete();
       await _auth.currentUser?.delete();
-      print('✔️ Account deleted for user: $uid');
+      print('✔️ Successfully deleted account for user: $uid');
       return true;
     } catch (e) {
       print('❌ Failed to delete account: $e');
@@ -64,36 +62,32 @@ class SettingsLogic {
     }
   }
 
-  String? validateEmail(String email, bool isArabic) {
+  String? validateEmail(String email) {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(email.trim())) {
-      return isArabic
-          ? 'استخدم بريدًا إلكترونيًا صالحًا'
-          : 'Use a valid email address';
+      return 'Use a valid email address';
     }
     return null;
   }
 
-  String? validatePhone(String phone, bool isArabic) {
+  String? validatePhone(String phone) {
     final phoneRegex = RegExp(r'^(059|97259)\d{7}$');
     if (!phoneRegex.hasMatch(phone.trim())) {
-      return isArabic
-          ? 'رقم الهاتف يجب أن يبدأ بـ 059 ويحتوي على 10 أرقام'
-          : 'Phone must start with 059 and be 10 digits';
+      return 'Phone must start with 059 and be 10 digits';
     }
     return null;
   }
 
-  String? validateName(String name, bool isArabic) {
+  String? validateName(String name) {
     if (name.trim().isEmpty) {
-      return isArabic ? 'الاسم لا يمكن أن يكون فارغًا' : 'Name cannot be empty';
+      return 'Name cannot be empty';
     }
     return null;
   }
 
-  String? validateLocation(String location, bool isArabic) {
+  String? validateLocation(String location) {
     if (location.trim().isEmpty) {
-      return isArabic ? 'الموقع لا يمكن أن يكون فارغًا' : 'Location cannot be empty';
+      return 'Location cannot be empty';
     }
     return null;
   }
