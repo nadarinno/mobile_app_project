@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'MainPage.dart';
-
 import 'package:mobile_app_project/View/SellerSignUp.dart';
 import 'ForgotPasswordPage.dart';
 import 'package:mobile_app_project/Controller/LoginController.dart';

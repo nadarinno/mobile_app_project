@@ -5,8 +5,8 @@ import 'package:mobile_app_project/View/Login.dart';
 import 'package:mobile_app_project/View/NotificationPage.dart';
 import 'package:mobile_app_project/View/SavedPage.dart';
 import 'package:mobile_app_project/View/CartPage.dart';
-// import 'package:mobile_app_project/View/SearchPage.dart';
-// import 'package:mobile_app_project/View/AccountPage.dart';
+ import 'package:mobile_app_project/View/search_page_view.dart';
+import 'package:mobile_app_project/View/settings_view.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
