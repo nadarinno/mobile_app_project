@@ -22,10 +22,9 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> _pages = [
     HomePage(),
     SearchPageView(),
-
     SavedPage(),
     CartPage(controller: CartController(),),
-  //SettingPage(),
+    SettingPage(),
   ];
 
   void _onItemTapped(int index) {

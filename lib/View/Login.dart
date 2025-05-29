@@ -4,6 +4,7 @@ import 'package:mobile_app_project/View/SellerSignUp.dart';
 import 'ForgotPasswordPage.dart';
 import 'package:mobile_app_project/Controller/LoginController.dart';
 import 'SignUp.dart';
+import 'package:mobile_app_project/View/admin_dashboard_view.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -24,13 +25,21 @@ class _LoginState extends State<Login> {
 
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      String? result = await controller.login(context);
+      final result = await controller.login(context);
 
-      if (result == 'success') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainPage()),
-        );
+      if (result != null && result['status'] == 'success') {
+        final role = result['role']?.toLowerCase();
+        if (role == 'admin') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => AdminDashboardView()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MainPage()),
+          );
+        }
       }
     }
   }

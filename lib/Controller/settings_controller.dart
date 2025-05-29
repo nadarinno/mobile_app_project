@@ -1,4 +1,3 @@
-// controllers/settings_controller.dart
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/logic/settings_logic.dart';
 
@@ -30,35 +29,35 @@ class SettingsController {
     );
   }
 
-  Future<void> deleteAccount(BuildContext context, bool isArabic) async {
+  Future<void> deleteAccount(BuildContext context) async {
     final success = await _logic.deleteAccount(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(success
-            ? (isArabic ? 'تم حذف الحساب بنجاح' : 'Account deleted successfully')
-            : (isArabic ? 'فشل حذف الحساب' : 'Failed to delete account')),
+            ? 'Account deleted successfully'
+            : 'Failed to delete account'),
         backgroundColor: success ? Colors.green : const Color(0xFF561C24),
       ),
     );
   }
 
-  void validateEmail(String email, bool isArabic) {
-    emailError = _logic.validateEmail(email, isArabic);
+  void validateEmail(String email) {
+    emailError = _logic.validateEmail(email);
     emailValid = emailError == null;
   }
 
-  void validatePhone(String phone, bool isArabic) {
-    phoneError = _logic.validatePhone(phone, isArabic);
+  void validatePhone(String phone) {
+    phoneError = _logic.validatePhone(phone);
     phoneValid = phoneError == null;
   }
 
-  void validateName(String name, bool isArabic) {
-    nameError = _logic.validateName(name, isArabic);
+  void validateName(String name) {
+    nameError = _logic.validateName(name);
     nameValid = nameError == null;
   }
 
-  void validateLocation(String location, bool isArabic) {
-    locationError = _logic.validateLocation(location, isArabic);
+  void validateLocation(String location) {
+    locationError = _logic.validateLocation(location);
     locationValid = locationError == null;
   }
 }

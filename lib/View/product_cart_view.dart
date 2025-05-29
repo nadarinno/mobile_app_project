@@ -117,7 +117,13 @@ class _ProductCardViewState extends State<ProductCardView> {
                       ),
                       onPressed: () async {
                         await _controller.toggleSaved(
-                            widget.productId, isSaved, context);
+                          widget.productId,
+                          isSaved,
+                          context,
+                          name: widget.productName,
+                          price: widget.price,
+                          imageUrl: widget.imageUrl,
+                        );
                       },
                     );
                   },
