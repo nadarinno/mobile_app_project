@@ -41,7 +41,10 @@ class CartController extends ChangeNotifier {
       print('Error updating quantity: $e at ${DateTime.now()}');
     }
   }
+  Future<void> clearCart() async {
 
+    notifyListeners();
+  }
   Future<void> removeItem(String itemId) async {
     try {
       await _cartModel.removeItem(itemId);

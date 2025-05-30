@@ -156,14 +156,22 @@ class CheckoutView extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                                 color: Colors.grey[200],
                               ),
-                              child: item.imagePath.isNotEmpty
+                              child: item.imagePath.isNotEmpty &&
+                                  (item.imagePath.startsWith('http') ||
+                                      item.imagePath.startsWith('https'))
                                   ? Image.network(
                                 item.imagePath,
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) =>
-                                    Icon(Icons.image, size: 20),
+                                    Image.asset(
+                                      'assets/images/cozyshoplogo.png',
+                                      fit: BoxFit.cover,
+                                    ),
                               )
-                                  : Icon(Icons.broken_image),
+                                  : Image.asset(
+                                'assets/images/cozyshoplogo.png',
+                                fit: BoxFit.cover,
+                              ),
                             ),
                             title: Text(item.name),
                             subtitle: Text(

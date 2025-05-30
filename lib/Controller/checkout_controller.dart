@@ -16,31 +16,41 @@ class CheckoutController extends ChangeNotifier {
   TextEditingController get addressController => _addressController;
   TextEditingController get phoneController => _phoneController;
 
-  void disposeControllers() {
+  @override
+  void dispose() {
     _nameController.dispose();
     _addressController.dispose();
     _phoneController.dispose();
+    super.dispose();
   }
 
-  Future<void> confirmOrder(BuildContext context, List<CartItem> cartItems) async {
+  Future<void> confirmOrder(
+    BuildContext context,
+    List<CartItem> cartItems,
+  ) async {
     if (formKey.currentState!.validate()) {
       isLoading = true;
       notifyListeners();
 
       try {
-        final cartController = Provider.of<CartController>(context, listen: false);
+        final cartController = Provider.of<CartController>(
+          context,
+          listen: false,
+        );
         await _checkoutModel.createOrder(
           cartItems,
           cartController.getTotalPrice(cartItems),
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Order placed successfully!')),
+          const SnackBar(content: Text('Order placed successfully!')),
         );
+        // Clear the cart after successful order
+        await cartController.clearCart();
         Navigator.pop(context);
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error during checkout: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error during checkout: $e')));
       } finally {
         isLoading = false;
         notifyListeners();

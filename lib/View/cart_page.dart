@@ -24,7 +24,6 @@ class CartPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFFDF6),
         elevation: 0,
-        leading: const BackButton(color: Color(0xFF561C24)),
         title: const Text('Cart', style: TextStyle(color: Color(0xFF561C24))),
         actions: [
           IconButton(
@@ -93,14 +92,22 @@ class CartPage extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(8),
                                   color: Colors.grey[200],
                                 ),
-                                child: item.imagePath.isNotEmpty
+                                child: item.imagePath.isNotEmpty &&
+                                    (item.imagePath.startsWith('http') ||
+                                        item.imagePath.startsWith('https'))
                                     ? Image.network(
                                   item.imagePath,
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) =>
-                                      Image.asset('assets/images/cozyshoplogo.png', fit: BoxFit.cover),
+                                      Image.asset(
+                                        'assets/images/cozyshoplogo.png',
+                                        fit: BoxFit.cover,
+                                      ),
                                 )
-                                    : Image.asset('assets/images/cozyshoplogo.png', fit: BoxFit.cover),
+                                    : Image.asset(
+                                  'assets/images/cozyshoplogo.png',
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                               SizedBox(width: screenWidth * 0.03),
                               Expanded(
@@ -175,13 +182,7 @@ class CartPage extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Checkbox(
-                        value: controller.selectAll,
-                        onChanged: (value) => controller.toggleSelectAll(value),
-                        activeColor: Color(0xFF561C24),
-                      ),
-                      const Text('All', style: TextStyle(color: Color(0xFF561C24))),
-                      const Spacer(),
+
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
@@ -199,6 +200,7 @@ class CartPage extends StatelessWidget {
                           ),
                         ],
                       ),
+                      const Spacer(),
                       const SizedBox(width: 12),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
