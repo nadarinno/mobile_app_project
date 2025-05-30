@@ -1,7 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'firebase_options.dart';
+import 'Logic/notification_handler.dart';
 import 'Controller/cart_controller.dart';
 import 'Controller/checkout_controller.dart';
 import 'View/Login.dart';
@@ -67,3 +69,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
