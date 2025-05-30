@@ -111,10 +111,6 @@ class _AddProductViewState extends State<AddProductView> {
                           borderSide: BorderSide(color: Color(0xFF561C24)),
                         ),
                       ),
-                      onFieldSubmitted: (_) {
-                        widget.logic.addColor();
-                        setState(() {});
-                      },
                       style: TextStyle(color: Color(0xFF561C24)),
                     ),
                   ),
@@ -137,25 +133,24 @@ class _AddProductViewState extends State<AddProductView> {
               ),
               Wrap(
                 spacing: 8,
-                children:
-                    widget.logic.selectedColors.map((color) {
-                      return Chip(
-                        label: Text(
-                          color,
-                          style: TextStyle(color: Color(0xFF561C24)),
-                        ),
-                        backgroundColor: Color(0xFFD0B8A8),
-                        deleteIcon: Icon(
-                          Icons.close,
-                          size: 18,
-                          color: Color(0xFF561C24),
-                        ),
-                        onDeleted: () {
-                          widget.logic.removeColor(color);
-                          setState(() {});
-                        },
-                      );
-                    }).toList(),
+                children: widget.logic.selectedColors.map((color) {
+                  return Chip(
+                    label: Text(
+                      color,
+                      style: TextStyle(color: Color(0xFF561C24)),
+                    ),
+                    backgroundColor: Color(0xFFD0B8A8),
+                    deleteIcon: Icon(
+                      Icons.close,
+                      size: 18,
+                      color: Color(0xFF561C24),
+                    ),
+                    onDeleted: () {
+                      widget.logic.removeColor(color);
+                      setState(() {});
+                    },
+                  );
+                }).toList(),
               ),
               SizedBox(height: 8),
               Text(
@@ -167,25 +162,24 @@ class _AddProductViewState extends State<AddProductView> {
               ),
               Wrap(
                 spacing: 8,
-                children:
-                    widget.logic.availableColors.map((color) {
-                      final isSelected = widget.logic.selectedColors.any(
+                children: widget.logic.availableColors.map((color) {
+                  final isSelected = widget.logic.selectedColors.any(
                         (c) => c.toLowerCase() == color.toLowerCase(),
-                      );
-                      return FilterChip(
-                        label: Text(
-                          color,
-                          style: TextStyle(color: Color(0xFF561C24)),
-                        ),
-                        selected: isSelected,
-                        backgroundColor: Color(0xFFD0B8A8),
-                        selectedColor: Color(0xFFD0B8A8).withOpacity(0.5),
-                        onSelected: (selected) {
-                          widget.logic.toggleColor(color, selected);
-                          setState(() {});
-                        },
-                      );
-                    }).toList(),
+                  );
+                  return FilterChip(
+                    label: Text(
+                      color,
+                      style: TextStyle(color: Color(0xFF561C24)),
+                    ),
+                    selected: isSelected,
+                    backgroundColor: Color(0xFFD0B8A8),
+                    selectedColor: Color(0xFFD0B8A8).withOpacity(0.5),
+                    onSelected: (selected) {
+                      widget.logic.toggleColor(color, selected);
+                      setState(() {});
+                    },
+                  );
+                }).toList(),
               ),
               SizedBox(height: 16),
               Text(
@@ -267,13 +261,12 @@ class _AddProductViewState extends State<AddProductView> {
           style: TextButton.styleFrom(backgroundColor: Color(0xFFD0B8A8)),
         ),
         ElevatedButton(
-          onPressed:
-              () => widget.controller.saveProduct(
-                context,
-                _formKey,
-                widget.updateTotals,
-                widget.logic,
-              ),
+          onPressed: () => widget.controller.saveProduct(
+            context,
+            _formKey,
+            widget.updateTotals,
+            widget.logic,
+          ),
           child: Text("Save", style: TextStyle(color: Color(0xFFF5F3ED))),
           style: ElevatedButton.styleFrom(
             backgroundColor: Color(0xFFD0B8A8),
