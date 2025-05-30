@@ -16,8 +16,8 @@ import 'package:mobile_app_project/Controller/delete_product_controller.dart';
 import 'package:mobile_app_project/view/delete_product_view.dart';
 import 'package:mobile_app_project/Controller/edit_product_controller.dart';
 import 'package:mobile_app_project/Logic/edit_product_logic.dart';
-import 'package:mobile_app_project/View/order_management_view.dart';
 
+import 'package:mobile_app_project/View/order_management_view.dart';
 class SellerDashboardView extends StatefulWidget {
   final SellerDashboardController controller;
   final SellerDashboardLogic logic;
@@ -81,7 +81,7 @@ class _SellerDashboardViewState extends State<SellerDashboardView> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => OrderManagementView(),
+                      builder: (context) => OrderManagementPage(),
                     ),
                   );
                 },

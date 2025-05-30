@@ -77,32 +77,26 @@ packages:
     dependency: "direct main"
     description:
       name: cloud_firestore
-
       sha256: d25c956be5261c14bc9a69c9662de8addb308376b4b53a64469aade52e7b02f8
       url: "https://pub.dev"
     source: hosted
     version: "5.6.8"
-
   cloud_firestore_platform_interface:
     dependency: transitive
     description:
       name: cloud_firestore_platform_interface
-
       sha256: ee2b8f8c602ede36073afd3741e99cfea9dd982b4a44833daf665134d151c32a
       url: "https://pub.dev"
     source: hosted
     version: "6.6.8"
-
   cloud_firestore_web:
     dependency: transitive
     description:
       name: cloud_firestore_web
-
       sha256: b99bc4f1f70787f694b73bc6fce238d4d6cc822c9b31ba8ef1578b180b6f77bc
       url: "https://pub.dev"
     source: hosted
     version: "4.4.8"
-
   cloud_functions:
     dependency: "direct main"
     description:
@@ -159,15 +153,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
-
-  dotted_line:
-    dependency: "direct main"
-    description:
-      name: dotted_line
-      sha256: "41e3d655939559815daa1370fc1e07673a205fa628cf40ce3af45d90029a77b6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.2.3"
   dbus:
     dependency: transitive
     description:
@@ -176,8 +161,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.11"
-
-
+  dotted_line:
+    dependency: "direct main"
+    description:
+      name: dotted_line
+      sha256: "41e3d655939559815daa1370fc1e07673a205fa628cf40ce3af45d90029a77b6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.3"
   fake_async:
     dependency: transitive
     description:
@@ -186,8 +177,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.2"
-
-
+  ffi:
+    dependency: transitive
+    description:
+      name: ffi
+      sha256: "289279317b4b16eb2bb7e271abccd4bf84ec9bdcbe999e278a94b804f5630418"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.4"
   file_selector_linux:
     dependency: transitive
     description:
@@ -220,16 +217,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.3+4"
-
-  ffi:
-    dependency: transitive
-    description:
-      name: ffi
-      sha256: "289279317b4b16eb2bb7e271abccd4bf84ec9bdcbe999e278a94b804f5630418"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.4"
-
   firebase_auth:
     dependency: "direct main"
     description:
@@ -326,8 +313,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.10.12"
-
-
   flutter:
     dependency: "direct main"
     description: flutter
@@ -365,16 +350,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.0"
-
-  flutter_plugin_android_lifecycle:
-    dependency: transitive
-    description:
-      name: flutter_plugin_android_lifecycle
-      sha256: f948e346c12f8d5480d2825e03de228d0eb8c3a737e4cdaa122267b89c022b5e
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.28"
-
   flutter_local_notifications:
     dependency: "direct main"
     description:
@@ -407,7 +382,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
-
+  flutter_plugin_android_lifecycle:
+    dependency: transitive
+    description:
+      name: flutter_plugin_android_lifecycle
+      sha256: f948e346c12f8d5480d2825e03de228d0eb8c3a737e4cdaa122267b89c022b5e
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.28"
   flutter_stripe:
     dependency: "direct main"
     description:
@@ -418,14 +400,14 @@ packages:
     version: "11.5.0"
   flutter_test:
     dependency: "direct dev"
-
-  flutter_localizations:
-    dependency: "direct main"
-
     description: flutter
     source: sdk
     version: "0.0.0"
-
+  flutter_web_plugins:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   freezed_annotation:
     dependency: transitive
     description:
@@ -435,10 +417,7 @@ packages:
     source: hosted
     version: "2.4.4"
   http:
-
-
     dependency: "direct main"
-
     description:
       name: http
       sha256: "2c11f3f94c687ee9bad77c171151672986360b2b001d109814ee7140b2cf261b"
@@ -453,6 +432,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  image:
+    dependency: transitive
+    description:
+      name: image
+      sha256: "4e973fcf4caae1a4be2fa0a13157aa38a8f9cb049db6529aa00b4d71abc4d928"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.5.4"
   image_picker:
     dependency: "direct main"
     description:
@@ -526,7 +513,13 @@ packages:
     source: hosted
     version: "0.19.0"
   json_annotation:
-
+    dependency: transitive
+    description:
+      name: json_annotation
+      sha256: "1ce844379ca14835a50d2f019a3099f419082cfdd231cd86a142af94dd5c6bb1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.9.0"
   leak_tracker:
     dependency: transitive
     description:

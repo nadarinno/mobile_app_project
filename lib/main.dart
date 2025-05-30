@@ -1,34 +1,28 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'package:mobile_app_project/View/cart_page.dart';
-import 'package:mobile_app_project/View/product_details_page.dart';
-import 'package:mobile_app_project/View/reviews_page.dart';
-import 'package:mobile_app_project/View/HomePage.dart';
-import 'package:mobile_app_project/View/MainPage.dart';
-import 'package:mobile_app_project/View/NotificationPage.dart';
-import 'package:mobile_app_project/View/SavedPage.dart';
-import 'package:mobile_app_project/View/checkout_view.dart';
 import 'package:provider/provider.dart';
-import 'Logic/notification_handler.dart';
+
 import 'firebase_options.dart';
-import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:flutter_stripe/flutter_stripe.dart';
-// import 'package:mobile_app_project/View/CartPage.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-import 'package:mobile_app_project/View/splash_screen.dart';
-
-
+import 'Logic/notification_handler.dart';
 import 'Controller/cart_controller.dart';
+
 import 'View/Login.dart';
+import 'View/MainPage.dart';
+import 'View/HomePage.dart';
+import 'View/NotificationPage.dart';
+import 'View/SavedPage.dart';
+import 'View/cart_page.dart';
+import 'View/product_details_page.dart';
+import 'View/reviews_page.dart';
+import 'View/checkout_view.dart';
+import 'View/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
-  await Firebase.initializeApp();
   runApp(
     MultiProvider(
       providers: [
@@ -36,12 +30,7 @@ void main() async {
       ],
       child: const MyApp(),
     ),
-
-
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
   );
- 
 }
 
 class MyApp extends StatelessWidget {
@@ -50,20 +39,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
-      title: 'My App',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      initialRoute: '/main',
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const SplashScreen(),
       routes: {
         '/login': (context) => const Login(),
         '/main': (context) => const MainPage(),
         '/home': (context) => const HomePage(),
         '/notifications': (context) => const NotificationPage(),
         '/saved': (context) => const SavedPage(),
-
-        '/cart':
-            (context) =>
-                CartPage(controller: Provider.of<CartController>(context)),
+        '/cart': (context) =>
+            CartPage(controller: Provider.of<CartController>(context)),
         '/product_details': (context) {
           final Object? args = ModalRoute.of(context)?.settings.arguments;
           final String productId = (args is String) ? args : '';
@@ -76,17 +65,6 @@ class MyApp extends StatelessWidget {
         },
         '/checkout': (context) => CheckoutView(),
       },
-    );
-  }
-}
-
-      title: 'Flutter Demo',
-      theme: ThemeData(
-
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const SplashScreen(),
-
     );
   }
 }
