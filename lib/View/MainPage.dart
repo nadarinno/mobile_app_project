@@ -4,6 +4,7 @@ import 'package:mobile_app_project/View/HomePage.dart';
 import 'package:mobile_app_project/View/NotificationPage.dart';
 import 'package:mobile_app_project/View/SavedPage.dart';
 import 'package:mobile_app_project/View/cart_page.dart';
+import 'package:mobile_app_project/View/settings_view.dart';
 import '../widgets/bottom_nav_bar.dart';
 
 class MainPage extends StatefulWidget {
@@ -27,7 +28,7 @@ class _MainPageState extends State<MainPage> {
       ),
       const CartPage(),
       const SavedPage(),
-      const NotificationPage(),
+      const SettingPage(),
     ];
   }
 
