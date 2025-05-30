@@ -20,7 +20,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
+   final List<Widget> _pages = [
     HomePage(),
     SearchPageView(),
     SavedPage(),
