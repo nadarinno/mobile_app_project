@@ -9,7 +9,7 @@ class ProductSearchController {
     return firestore
         .collection('products')
         .where('name', isGreaterThanOrEqualTo: query)
-        .where('name', isLessThan: query + 'z')
+        .where('name', isLessThan: '${query}z')
         .snapshots();
   }
 }

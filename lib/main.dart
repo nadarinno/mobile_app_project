@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:mobile_app_project/View/cart_page.dart';
 import 'package:mobile_app_project/View/product_details_page.dart';
 import 'package:mobile_app_project/View/reviews_page.dart';
@@ -10,12 +11,23 @@ import 'package:mobile_app_project/View/NotificationPage.dart';
 import 'package:mobile_app_project/View/SavedPage.dart';
 import 'package:mobile_app_project/View/checkout_view.dart';
 import 'package:provider/provider.dart';
+import 'Logic/notification_handler.dart';
+import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:flutter_stripe/flutter_stripe.dart';
+// import 'package:mobile_app_project/View/CartPage.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+import 'package:mobile_app_project/View/splash_screen.dart';
+
 
 import 'Controller/cart_controller.dart';
 import 'View/Login.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp();
   runApp(
     MultiProvider(
@@ -24,7 +36,12 @@ void main() async {
       ],
       child: const MyApp(),
     ),
+
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
+ 
 }
 
 class MyApp extends StatelessWidget {
@@ -33,6 +50,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+
       title: 'My App',
       theme: ThemeData(primarySwatch: Colors.blue),
       initialRoute: '/main',
@@ -61,3 +79,15 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+      title: 'Flutter Demo',
+      theme: ThemeData(
+
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      ),
+      home: const SplashScreen(),
+
+    );
+  }
+}
+
