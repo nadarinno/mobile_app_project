@@ -97,6 +97,7 @@ class _LoginState extends State<Login> {
                 ),
               const SizedBox(height: 10),
               TextFormField(
+                autovalidateMode: AutovalidateMode.always,
                 controller: controller.emailController,
                 decoration: const InputDecoration(
                   hintText: 'Enter your email',
@@ -108,6 +109,7 @@ class _LoginState extends State<Login> {
               ),
               const SizedBox(height: 20),
               TextFormField(
+                autovalidateMode: AutovalidateMode.always,
                 controller: controller.passwordController,
                 obscureText: true,
                 decoration: const InputDecoration(

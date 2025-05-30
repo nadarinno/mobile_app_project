@@ -1,11 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'firebase_options.dart';
 import 'Logic/notification_handler.dart';
 import 'Controller/cart_controller.dart';
-
 import 'View/Login.dart';
 import 'View/MainPage.dart';
 import 'View/HomePage.dart';
@@ -51,8 +49,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomePage(),
         '/notifications': (context) => const NotificationPage(),
         '/saved': (context) => const SavedPage(),
-        '/cart': (context) =>
-            CartPage(controller: Provider.of<CartController>(context)),
+        '/cart': (context) => const CartPage(), // Updated to remove controller
         '/product_details': (context) {
           final Object? args = ModalRoute.of(context)?.settings.arguments;
           final String productId = (args is String) ? args : '';
@@ -63,9 +60,8 @@ class MyApp extends StatelessWidget {
           final String productId = (args is String) ? args : '';
           return ReviewsPage(productId: productId);
         },
-        '/checkout': (context) => CheckoutView(),
+        '/checkout': (context) =>  CheckoutView(),
       },
     );
   }
 }
-

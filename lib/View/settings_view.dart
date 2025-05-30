@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/Controller/settings_controller.dart';
 import 'package:mobile_app_project/View/Login.dart';
+import 'package:mobile_app_project/View/select_payment_view.dart';
+import 'ForgotPasswordPage.dart';
+
 const Color primaryColor = Color(0xFF561C24);
 
 class SettingPage extends StatefulWidget {
@@ -239,6 +242,7 @@ class _SettingPageState extends State<SettingPage> {
             ),
           ),
           _editableTile(
+
             title: 'Change Email',
             icon: Icons.email,
             isEditing: _isEditingEmail,
@@ -279,17 +283,20 @@ class _SettingPageState extends State<SettingPage> {
             showDone: _controller.phoneValid,
             onDone: () => setState(() => _isEditingPhone = false),
             child: TextField(
+              keyboardType: TextInputType.phone,
               controller: _phoneController,
               decoration: InputDecoration(
                 hintText: '059xxxxxxxx',
                 errorText: _controller.phoneError,
+
                 suffixIcon: _controller.phoneValid
                     ? const Icon(Icons.check_circle, color: Colors.green)
                     : (_controller.phoneError != null
                     ? const Icon(Icons.error, color: primaryColor)
                     : null),
+
               ),
-              keyboardType: TextInputType.phone,
+
             ),
           ),
           _buildCard(
@@ -305,7 +312,7 @@ class _SettingPageState extends State<SettingPage> {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const ChangePasswordPage(),
+                  builder: (_) => const ForgotPasswordPage(fromSettings: true),
                 ),
               ),
             ),
@@ -353,6 +360,7 @@ class _SettingPageState extends State<SettingPage> {
             showDone: _controller.locationValid,
             onDone: () => setState(() => _isEditingLocation = false),
             child: TextField(
+
               controller: _locationController,
               decoration: InputDecoration(
                 hintText: 'Nablus, Rafidia',
@@ -373,7 +381,7 @@ class _SettingPageState extends State<SettingPage> {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const PaymentPage(),
+                  builder: (_) => const SelectPaymentMethod(),
                 ),
               ),
             ),
@@ -442,26 +450,3 @@ class _SettingPageState extends State<SettingPage> {
   }
 }
 
-class ChangePasswordPage extends StatelessWidget {
-  const ChangePasswordPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Change Password')),
-      body: const Center(child: Text('Change Password Page')),
-    );
-  }
-}
-
-class PaymentPage extends StatelessWidget {
-  const PaymentPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Payment Method')),
-      body: const Center(child: Text('Payment Method Page')),
-    );
-  }
-}

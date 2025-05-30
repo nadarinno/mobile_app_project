@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app_project/View/settings_view.dart';
 import 'Login.dart';
 import 'package:mobile_app_project/Controller/ForgotPasswordController.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
-  const ForgotPasswordPage({super.key});
+  final bool fromSettings;
+
+  const ForgotPasswordPage({super.key, this.fromSettings = false});
 
   @override
   State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
+
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final _formKey = GlobalKey<FormState>();
@@ -32,8 +36,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const Login()),
+          MaterialPageRoute(
+            builder: (context) => widget.fromSettings ? const Login(): const SettingPage() ,
+          ),
         );
+
       }
     }
   }
@@ -59,10 +66,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       color: Color(0xFF561C24),
                     ),
                     onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Login()),
-                      );
+                      if (widget.fromSettings) {
+                        Navigator.pop(context);
+                      } else {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const Login()),
+                        );
+                      }
+
                     },
                   ),
                 ],
@@ -106,6 +118,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
               const SizedBox(height: 10),
               TextFormField(
+
                 controller: controller.emailController,
                 decoration: const InputDecoration(
                   labelText: 'Email',
@@ -129,7 +142,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   child: const Text(
                     'Send Reset Link',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 12,
                       color: Color(0xFFFFFDF6),
                       fontWeight: FontWeight.bold,
                     ),
@@ -137,30 +150,32 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Remembered your password? ",
-                    style: TextStyle(fontWeight: FontWeight.w400),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Login()),
-                      );
-                    },
-                    child: const Text(
-                      'Login',
-                      style: TextStyle(
-                        color: Color(0xFF561C24),
-                        fontWeight: FontWeight.w600,
+              if (!widget.fromSettings)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Remembered your password? ",
+                      style: TextStyle(fontWeight: FontWeight.w400),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const Login()),
+                        );
+                      },
+                      child: const Text(
+                        'Login',
+                        style: TextStyle(
+                          color: Color(0xFF561C24),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+
             ],
           ),
         ),

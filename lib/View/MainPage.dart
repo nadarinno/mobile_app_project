@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:mobile_app_project/Controller/CartController.dart'; // Choose one import
+import 'package:mobile_app_project/View/search_page_view.dart';
 import 'package:mobile_app_project/View/HomePage.dart';
-import 'package:mobile_app_project/View/NotificationPage.dart';
-import 'package:mobile_app_project/View/SavedPage.dart';
-import 'package:mobile_app_project/View/CartPage.dart';
-import '../widgets/bottom_nav_bar.dart';
 
+import 'package:mobile_app_project/View/SavedPage.dart';
+import 'package:mobile_app_project/View/cart_page.dart';
+import '../widgets/bottom_nav_bar.dart';
+import 'package:mobile_app_project/View/settings_view.dart';
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
@@ -23,9 +22,10 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     _pages = [
       HomePage(onNavigate: _onItemTapped),
-      const NotificationPage(),
-      SavedPage(),
-      CartPage(controller: context.read<CartController>()),
+      SearchPageView(),
+      const CartPage(),
+      const SavedPage(),
+      const SettingPage(),
     ];
   }
 

@@ -94,6 +94,7 @@ class _SellerSignUpState extends State<SellerSignUp> {
               ),
               const SizedBox(height: 20),
               TextFormField(
+                autovalidateMode: AutovalidateMode.always,
                 controller: controller.emailController,
                 decoration: const InputDecoration(
                   hintText: 'Enter your email',
@@ -105,6 +106,7 @@ class _SellerSignUpState extends State<SellerSignUp> {
               ),
               const SizedBox(height: 20),
               TextFormField(
+                autovalidateMode: AutovalidateMode.always,
                 controller: controller.passwordController,
                 obscureText: true,
                 decoration: const InputDecoration(

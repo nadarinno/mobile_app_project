@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'checkout_view.dart';
 
 class CartPage extends StatelessWidget {
-  const CartPage({Key? key, required CartController controller}) : super(key: key);
+  const CartPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,21 +14,21 @@ class CartPage extends StatelessWidget {
 
     if (controller.isLoading) {
       return Scaffold(
-        backgroundColor: Color(0xFFFFFDF6),
-        body: Center(child: CircularProgressIndicator()),
+        backgroundColor: const Color(0xFFFFFDF6),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      backgroundColor: Color(0xFFFFFDF6),
+      backgroundColor: const Color(0xFFFFFDF6),
       appBar: AppBar(
-        backgroundColor: Color(0xFFFFFDF6),
+        backgroundColor: const Color(0xFFFFFDF6),
         elevation: 0,
-        leading: BackButton(color: Color(0xFF561C24)),
-        title: Text('Cart', style: TextStyle(color: Color(0xFF561C24))),
+        leading: const BackButton(color: Color(0xFF561C24)),
+        title: const Text('Cart', style: TextStyle(color: Color(0xFF561C24))),
         actions: [
           IconButton(
-            icon: Icon(Icons.shopping_cart, color: Color(0xFF561C24)),
+            icon: const Icon(Icons.shopping_cart, color: Color(0xFF561C24)),
             onPressed: () {},
           ),
         ],
@@ -38,7 +38,7 @@ class CartPage extends StatelessWidget {
           stream: controller.cartItems,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
 
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -46,18 +46,16 @@ class CartPage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Your cart is empty'),
-                    SizedBox(height: 20),
+                    const Text('Your cart is empty'),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF561C24),
+                        backgroundColor: const Color(0xFF561C24),
                       ),
                       onPressed: () {
-                        // Navigate to Home tab in MainPage
-                        // Assuming MainPage uses a Navigator or tab controller
                         Navigator.pushReplacementNamed(context, '/home');
                       },
-                      child: Text(
+                      child: const Text(
                         'Browse Products',
                         style: TextStyle(color: Color(0xFFFFFDF6)),
                       ),
@@ -77,11 +75,10 @@ class CartPage extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final item = cartItems[index];
                       return Card(
-                        margin: EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        color: Color(0xFFD0B8A8),
+                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        color: const Color(0xFFD0B8A8),
                         child: Padding(
-                          padding: EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(8.0),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -96,27 +93,24 @@ class CartPage extends StatelessWidget {
                                     ? Image.network(
                                   item.imagePath,
                                   fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (context, error, stackTrace) =>
-                                      Icon(Icons.image, size: 30),
+                                  errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.image, size: 30),
                                 )
-                                    : Icon(Icons.broken_image),
+                                    : const Icon(Icons.broken_image),
                               ),
                               SizedBox(width: screenWidth * 0.03),
                               Expanded(
                                 child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       item.name,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
                                       ),
                                     ),
-                                    Text(
-                                        '\$${item.price.toStringAsFixed(2)}'),
+                                    Text('\$${item.price.toStringAsFixed(2)}'),
                                   ],
                                 ),
                               ),
@@ -124,12 +118,12 @@ class CartPage extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    icon: Icon(
-                                        Icons.remove_circle_outline,
-                                        color: Color(0xFF561C24),
-                                        size: 20),
-                                    onPressed: () => controller.updateQuantity(
-                                        item.id, item.quantity - 1),
+                                    icon: const Icon(
+                                      Icons.remove_circle_outline,
+                                      color: Color(0xFF561C24),
+                                      size: 20,
+                                    ),
+                                    onPressed: () => controller.updateQuantity(item.id, item.quantity - 1),
                                   ),
                                   Container(
                                     width: 24,
@@ -137,16 +131,21 @@ class CartPage extends StatelessWidget {
                                     child: Text('${item.quantity}'),
                                   ),
                                   IconButton(
-                                    icon: Icon(Icons.add_circle_outline,
-                                        color: Color(0xFF561C24), size: 20),
-                                    onPressed: () => controller.updateQuantity(
-                                        item.id, item.quantity + 1),
+                                    icon: const Icon(
+                                      Icons.add_circle_outline,
+                                      color: Color(0xFF561C24),
+                                      size: 20,
+                                    ),
+                                    onPressed: () => controller.updateQuantity(item.id, item.quantity + 1),
                                   ),
                                 ],
                               ),
                               IconButton(
-                                icon: Icon(Icons.delete,
-                                    color: Color(0xFF561C24), size: 20),
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Color(0xFF561C24),
+                                  size: 20,
+                                ),
                                 onPressed: () => controller.removeItem(item.id),
                               ),
                             ],
@@ -157,9 +156,8 @@ class CartPage extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: const BoxDecoration(
                     color: Color(0xFFD0B8A8),
                     border: Border(top: BorderSide(color: Colors.grey)),
                   ),
@@ -167,41 +165,39 @@ class CartPage extends StatelessWidget {
                     children: [
                       Checkbox(
                         value: controller.selectAll,
-                        onChanged: (value) =>
-                            controller.toggleSelectAll(value),
+                        onChanged: (value) => controller.toggleSelectAll(value),
                       ),
-                      Text('All'),
-                      Spacer(),
+                      const Text('All'),
+                      const Spacer(),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
                             'Total: \$${controller.getTotalPrice(cartItems).toStringAsFixed(2)}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
                             '${controller.getTotalItems(cartItems)} items',
-                            style: TextStyle(fontSize: 12),
+                            style: const TextStyle(fontSize: 12),
                           ),
                         ],
                       ),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           minimumSize: Size(screenWidth * 0.25, 48),
-                          backgroundColor: Color(0xFF561C24),
+                          backgroundColor: const Color(0xFF561C24),
                         ),
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => CheckoutView()),
+                            MaterialPageRoute(builder: (context) =>  CheckoutView()),
                           );
                         },
-                        child: Text(
+                        child: const Text(
                           'Checkout',
                           style: TextStyle(color: Color(0xFFFFFDF6)),
                         ),
@@ -214,8 +210,6 @@ class CartPage extends StatelessWidget {
           },
         ),
       ),
-      // Removed bottomNavigationBar to rely on MainPage's navigation
-      // MainPage should handle tab navigation (Home, Search, Saved, Cart, Account)
     );
   }
 }
