@@ -1,8 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:http/http.dart'; // http.dart was imported but not used, can be removed if still unused
-import 'package:provider/provider.dart'; // Import Provider for context.read
+import 'package:provider/provider.dart';
 import 'package:mobile_app_project/View/Login.dart';
 import 'package:mobile_app_project/Controller/HomePageController.dart';
 import 'package:mobile_app_project/View/product_details_page.dart';
@@ -10,7 +8,7 @@ import 'package:mobile_app_project/View/NotificationPage.dart';
 import 'package:mobile_app_project/View/SavedPage.dart';
 import 'package:mobile_app_project/View/cart_page.dart';
 import '../Controller/cart_controller.dart';
-import '../widgets/bottom_nav_bar.dart'; // Corrected import path if needed
+import '../widgets/bottom_nav_bar.dart';
 
 class HomePage extends StatefulWidget {
   final Function(int)? onNavigate;
@@ -26,34 +24,27 @@ class _HomePageState extends State<HomePage> {
   final int notificationCount = 5; // Example notification count
   int _currentIndex = 0; // Local index for BottomNavigationBar when standalone
 
-  // Pages for standalone navigation
-  // CORRECTED: Use 'late final' and initialize in initState
   late final List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
-    // Initialize _pages here where context is available
-    // and use HomePageContent for the first page.
     _pages = [
       HomePageContent(
-        controller: controller, // Pass the HomePageState's controller
-        notificationCount: notificationCount, // Pass the HomePageState's notificationCount
-        onNavigate: _onItemTapped, // Pass the HomePageState's navigation handler
+        controller: controller,
+        notificationCount: notificationCount,
+        onNavigate: _onItemTapped,
       ),
       const NotificationPage(),
       const SavedPage(),
-      CartPage(controller: context.read<CartController>()), // Now this is correct
+      const CartPage(), // Remove controller parameter
     ];
   }
 
   void _onItemTapped(int index) {
     if (widget.onNavigate != null) {
-      // If used within MainPage, delegate to MainPage's navigation
       widget.onNavigate!(index);
     } else {
-      // Handle navigation locally when standalone
-      // Ensure we don't try to navigate to an index out of bounds for _pages
       if (index >= 0 && index < _pages.length) {
         setState(() {
           _currentIndex = index;
@@ -64,46 +55,43 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // It's generally safer to not call Navigator methods directly during build
-    // unless guarded properly. addPostFrameCallback is a good way.
     if (!controller.isAuthenticated) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) { // Check if the widget is still in the tree
-          Navigator.pushAndRemoveUntil( // Use pushAndRemoveUntil to prevent going back
+        if (mounted) {
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const Login()),
-                (Route<dynamic> route) => false, // Removes all previous routes
+                (Route<dynamic> route) => false,
           );
         }
       });
-      // Return a placeholder while redirecting to avoid build errors
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // If onNavigate is provided, return just the content (used in MainPage)
     if (widget.onNavigate != null) {
       return HomePageContent(
         controller: controller,
         notificationCount: notificationCount,
-        onNavigate: widget.onNavigate!, // Use the onNavigate from the widget parameters
+        onNavigate: widget.onNavigate!,
       );
     }
 
-    // If standalone, include BottomNavigationBar
     return Scaffold(
       body: (_currentIndex >= 0 && _currentIndex < _pages.length)
           ? _pages[_currentIndex]
-          : const Center(child: Text("Page not found")), // Fallback for safety
-      bottomNavigationBar: CustomBottomNavBar(currentIndex: _currentIndex, onTap: _onItemTapped,),
+          : const Center(child: Text("Page not found")),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: _currentIndex,
+        onTap: _onItemTapped,
+      ),
     );
   }
 }
 
-// Extracted HomePage content to a separate widget for reusability
 class HomePageContent extends StatelessWidget {
   final HomePageController controller;
   final int notificationCount;
-  final Function(int) onNavigate; // Callback to navigate to a specific index
+  final Function(int) onNavigate;
 
   const HomePageContent({
     super.key,
@@ -119,7 +107,7 @@ class HomePageContent extends StatelessWidget {
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Image.asset(
-            'assets/images/smalllogo.png', // Ensure this asset exists
+            'assets/images/smalllogo.png',
             fit: BoxFit.contain,
           ),
         ),
@@ -141,11 +129,11 @@ class HomePageContent extends StatelessWidget {
                   color: Color(0xFF561C24),
                 ),
                 onPressed: () {
-                  onNavigate(1); // Navigate to Notifications page (index 1)
+                  onNavigate(1);
                 },
               ),
               if (notificationCount > 0)
-                Positioned( // Adjusted position for better visibility
+                Positioned(
                   right: 8,
                   top: 8,
                   child: Container(
@@ -158,11 +146,11 @@ class HomePageContent extends StatelessWidget {
                       minWidth: 16,
                       minHeight: 16,
                     ),
-                    child: Center( // Center the text
+                    child: Center(
                       child: Text(
-                        notificationCount.toString(), // Display actual count
+                        notificationCount.toString(),
                         style: const TextStyle(
-                          fontSize: 10, // Adjusted size
+                          fontSize: 10,
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
@@ -200,7 +188,7 @@ class HomePageContent extends StatelessWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 0.65, // Adjusted for more content
+                childAspectRatio: 0.65,
               ),
               itemBuilder: (context, index) {
                 final productId = products[index].id;
@@ -227,10 +215,10 @@ class HomePageContent extends StatelessWidget {
                         elevation: 3,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch children horizontally
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Expanded(
-                              flex: 3, // Give more space to image
+                              flex: 3,
                               child: ClipRRect(
                                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                                 child: (imageUrl != null && imageUrl.startsWith('http'))
@@ -240,15 +228,15 @@ class HomePageContent extends StatelessWidget {
                                   width: double.infinity,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Image.asset(
-                                      'assets/images/cozyshoplogo.png', // Ensure this placeholder exists
-                                      fit: BoxFit.contain, // Use contain for placeholder
+                                      'assets/images/cozyshoplogo.png',
+                                      fit: BoxFit.contain,
                                       width: double.infinity,
                                     );
                                   },
                                 )
                                     : Image.asset(
-                                  'assets/images/cozyshoplogo.png', // Ensure this placeholder exists
-                                  fit: BoxFit.contain, // Use contain for placeholder
+                                  'assets/images/cozyshoplogo.png',
+                                  fit: BoxFit.contain,
                                   width: double.infinity,
                                 ),
                               ),
@@ -269,7 +257,7 @@ class HomePageContent extends StatelessWidget {
                                 style: const TextStyle(fontSize: 13, color: Color(0xFF561C24)),
                               ),
                             ),
-                            Align( // Keep save button at the bottom
+                            Align(
                               alignment: Alignment.bottomRight,
                               child: savedSnapshot.connectionState == ConnectionState.waiting
                                   ? const Padding(
@@ -290,9 +278,7 @@ class HomePageContent extends StatelessWidget {
                                 },
                               ),
                             ),
-                            const SizedBox(height: 4), // Spacing at the bottom
-
-
+                            const SizedBox(height: 4),
                           ],
                         ),
                       ),

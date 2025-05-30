@@ -1,15 +1,14 @@
-
 import 'package:flutter/material.dart';
 import '../Controller/search_controller.dart';
 
-
-
 class SearchBarView extends StatefulWidget {
   final Function(String) onSearch;
+  final Function(int)? onNavigate;
 
   const SearchBarView({
     super.key,
     required this.onSearch,
+    this.onNavigate,
   });
 
   @override
@@ -29,70 +28,91 @@ class _SearchBarViewState extends State<SearchBarView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          controller: _controller.textController,
-          decoration: InputDecoration(
-            hintText: 'Search...',
-            hintStyle: TextStyle(color: burgundy.withAlpha(150)),
-            prefixIcon: const Icon(Icons.search, color: burgundy),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: BorderSide(color: burgundy),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: BorderSide(color: burgundy),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: BorderSide(color: burgundy, width: 2),
-            ),
-            filled: true,
-            fillColor: lightBurgundy,
-            suffixIcon: _controller.textController.text.trim().isNotEmpty
-                ? IconButton(
-              icon: const Icon(Icons.clear, color: burgundy),
-              onPressed: () {
-                setState(() {
-                  _controller.clearSearch();
-                });
-              },
-            )
-                : null,
-          ),
-          style: const TextStyle(color: burgundy),
-          onChanged: (value) async {
-            await _controller.updateSuggestions(value);
-            setState(() {});
-          },
-          onSubmitted: widget.onSearch,
-        ),
-        if (_controller.textController.text.trim().isNotEmpty)
-          _controller.suggestions.isNotEmpty
-              ? Column(
-            children: _controller.suggestions
-                .map(
-                  (s) => ListTile(
-                title: Text(s, style: const TextStyle(color: burgundy)),
-                onTap: () {
-                  setState(() {
-                    _controller.selectSuggestion(s, widget.onSearch);
-                  });
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double maxWidth = constraints.maxWidth;
+        double padding = maxWidth < 600 ? 16.0 : 32.0;
+
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: padding),
+          child: Column(
+            children: [
+              const SizedBox(height: 60),
+              TextField(
+                controller: _controller.textController,
+                decoration: InputDecoration(
+                  hintText: 'Search...',
+                  hintStyle: TextStyle(color: burgundy.withAlpha(150)),
+                  prefixIcon: const Icon(Icons.search, color: burgundy),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(color: burgundy),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(color: burgundy),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(color: burgundy, width: 2),
+                  ),
+                  filled: true,
+                  fillColor: lightBurgundy,
+                  suffixIcon: _controller.textController.text.trim().isNotEmpty
+                      ? IconButton(
+                    icon: const Icon(Icons.clear, color: burgundy),
+                    onPressed: () {
+                      setState(() {
+                        _controller.clearSearch();
+                      });
+                    },
+                  )
+                      : null,
+                ),
+                style: const TextStyle(color: burgundy),
+                onChanged: (value) async {
+                  await _controller.updateSuggestions(value);
+                  setState(() {});
                 },
+                onSubmitted: widget.onSearch,
               ),
-            )
-                .toList(),
-          )
-              : const Padding(
-            padding: EdgeInsets.all(8),
-            child: Text(
-              'No matching items found',
-              style: TextStyle(color: burgundy, fontSize: 16),
-            ),
+              if (_controller.textController.text.trim().isNotEmpty)
+                _controller.suggestions.isNotEmpty
+                    ? Container(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.4,
+                  ),
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: _controller.suggestions
+                        .map(
+                          (s) => ListTile(
+                        title: Text(
+                          s,
+                          style: const TextStyle(color: burgundy),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _controller.selectSuggestion(
+                                s, widget.onSearch);
+                          });
+                        },
+                      ),
+                    )
+                        .toList(),
+                  ),
+                )
+                    : const Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text(
+                    'No matching items found',
+                    style: TextStyle(color: burgundy, fontSize: 16),
+                  ),
+                ),
+            ],
           ),
-      ],
+        );
+      },
     );
   }
 }

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:mobile_app_project/Controller/CartController.dart'; // Choose one import
+import 'package:mobile_app_project/View/search_bar_view.dart';
 import 'package:mobile_app_project/View/HomePage.dart';
 import 'package:mobile_app_project/View/NotificationPage.dart';
 import 'package:mobile_app_project/View/SavedPage.dart';
-import 'package:mobile_app_project/View/CartPage.dart';
+import 'package:mobile_app_project/View/cart_page.dart';
 import '../widgets/bottom_nav_bar.dart';
 
 class MainPage extends StatefulWidget {
@@ -23,10 +22,20 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     _pages = [
       HomePage(onNavigate: _onItemTapped),
+      SearchBarView(
+        onSearch: _handleSearch, // Provide the required onSearch callback
+      ),
+      const CartPage(),
+      const SavedPage(),
       const NotificationPage(),
-      SavedPage(),
-      CartPage(controller: context.read<CartController>()),
     ];
+  }
+
+  // Handler for search input
+  void _handleSearch(String query) {
+
+    print('Search query: $query');
+
   }
 
   void _onItemTapped(int index) {
