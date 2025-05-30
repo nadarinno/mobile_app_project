@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const Login()),
-                (Route<dynamic> route) => false,
+            (Route<dynamic> route) => false,
           );
         }
       });
@@ -77,9 +77,10 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Scaffold(
-      body: (_currentIndex >= 0 && _currentIndex < _pages.length)
-          ? _pages[_currentIndex]
-          : const Center(child: Text("Page not found")),
+      body:
+          (_currentIndex >= 0 && _currentIndex < _pages.length)
+              ? _pages[_currentIndex]
+              : const Center(child: Text("Page not found")),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _currentIndex,
         onTap: _onItemTapped,
@@ -114,9 +115,7 @@ class HomePageContent extends StatelessWidget {
         centerTitle: true,
         title: const Text(
           'Cozy Shop',
-          style: TextStyle(
-            color: Color(0xFF561C24),
-          ),
+          style: TextStyle(color: Color(0xFF561C24)),
         ),
         backgroundColor: const Color(0xFFFFFDF6),
         actions: [
@@ -124,12 +123,12 @@ class HomePageContent extends StatelessWidget {
             clipBehavior: Clip.none,
             children: [
               IconButton(
-                icon: const Icon(
-                  Icons.notifications,
-                  color: Color(0xFF561C24),
-                ),
+                icon: const Icon(Icons.notifications, color: Color(0xFF561C24)),
                 onPressed: () {
-                  onNavigate(1);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => NotificationPage()),
+                  );
                 },
               ),
               if (notificationCount > 0)
@@ -169,7 +168,9 @@ class HomePageContent extends StatelessWidget {
           stream: controller.productsStream,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return Center(child: Text('Error loading products: ${snapshot.error}'));
+              return Center(
+                child: Text('Error loading products: ${snapshot.error}'),
+              );
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -192,10 +193,15 @@ class HomePageContent extends StatelessWidget {
               ),
               itemBuilder: (context, index) {
                 final productId = products[index].id;
-                final productData = products[index].data() as Map<String, dynamic>;
-                final String productName = productData['name'] as String? ?? 'Unnamed Product';
+                final productData =
+                    products[index].data() as Map<String, dynamic>;
+                final String productName =
+                    productData['name'] as String? ?? 'Unnamed Product';
                 final String? imageUrl = productData['image'] as String?;
-                final double productPrice = (productData['price'] is num) ? (productData['price'] as num).toDouble() : 0.0;
+                final double productPrice =
+                    (productData['price'] is num)
+                        ? (productData['price'] as num).toDouble()
+                        : 0.0;
 
                 return StreamBuilder<bool>(
                   stream: controller.isSaved(productId),
@@ -206,77 +212,121 @@ class HomePageContent extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ProductDetailsPage(productId: productId),
+                            builder:
+                                (context) =>
+                                    ProductDetailsPage(productId: productId),
                           ),
                         );
                       },
                       child: Card(
                         color: const Color(0xFFF5F3ED),
                         elevation: 3,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Expanded(
                               flex: 3,
                               child: ClipRRect(
-                                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                                child: (imageUrl != null && imageUrl.startsWith('http'))
-                                    ? Image.network(
-                                  imageUrl,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Image.asset(
-                                      'assets/images/cozyshoplogo.png',
-                                      fit: BoxFit.contain,
-                                      width: double.infinity,
-                                    );
-                                  },
-                                )
-                                    : Image.asset(
-                                  'assets/images/cozyshoplogo.png',
-                                  fit: BoxFit.contain,
-                                  width: double.infinity,
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(12),
                                 ),
+                                child:
+                                    (imageUrl != null &&
+                                            imageUrl.startsWith('http'))
+                                        ? Image.network(
+                                          imageUrl,
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          errorBuilder: (
+                                            context,
+                                            error,
+                                            stackTrace,
+                                          ) {
+                                            return Image.asset(
+                                              'assets/images/cozyshoplogo.png',
+                                              fit: BoxFit.contain,
+                                              width: double.infinity,
+                                            );
+                                          },
+                                        )
+                                        : Image.asset(
+                                          'assets/images/cozyshoplogo.png',
+                                          fit: BoxFit.contain,
+                                          width: double.infinity,
+                                        ),
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 4.0),
+                              padding: const EdgeInsets.fromLTRB(
+                                8.0,
+                                8.0,
+                                8.0,
+                                4.0,
+                              ),
                               child: Text(
                                 productName,
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                              ),
                               child: Text(
                                 '\$${productPrice.toStringAsFixed(2)}',
-                                style: const TextStyle(fontSize: 13, color: Color(0xFF561C24)),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xFF561C24),
+                                ),
                               ),
                             ),
                             Align(
                               alignment: Alignment.bottomRight,
-                              child: savedSnapshot.connectionState == ConnectionState.waiting
-                                  ? const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
-                              )
-                                  : IconButton(
-                                icon: Icon(
-                                  isSaved ? Icons.favorite : Icons.favorite_border,
-                                  color: isSaved ? Colors.red : Colors.grey[600],
-                                ),
-                                onPressed: () async {
-                                  if (isSaved) {
-                                    await controller.deleteSavedItem(productId, context);
-                                  } else {
-                                    await controller.saveItem(productId, context);
-                                  }
-                                },
-                              ),
+                              child:
+                                  savedSnapshot.connectionState ==
+                                          ConnectionState.waiting
+                                      ? const Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                      )
+                                      : IconButton(
+                                        icon: Icon(
+                                          isSaved
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                          color:
+                                              isSaved
+                                                  ? Colors.red
+                                                  : Colors.grey[600],
+                                        ),
+                                        onPressed: () async {
+                                          if (isSaved) {
+                                            await controller.deleteSavedItem(
+                                              productId,
+                                              context,
+                                            );
+                                          } else {
+                                            await controller.saveItem(
+                                              productId,
+                                              context,
+                                            );
+                                          }
+                                        },
+                                      ),
                             ),
                             const SizedBox(height: 4),
                           ],

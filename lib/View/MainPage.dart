@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app_project/View/search_bar_view.dart';
+import 'package:mobile_app_project/View/search_page_view.dart';
 import 'package:mobile_app_project/View/HomePage.dart';
 import 'package:mobile_app_project/View/NotificationPage.dart';
 import 'package:mobile_app_project/View/SavedPage.dart';
 import 'package:mobile_app_project/View/cart_page.dart';
-import 'package:mobile_app_project/View/settings_view.dart';
 import '../widgets/bottom_nav_bar.dart';
-
+import 'package:mobile_app_project/View/settings_view.dart';
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
@@ -23,9 +22,7 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     _pages = [
       HomePage(onNavigate: _onItemTapped),
-      SearchBarView(
-        onSearch: _handleSearch, // Provide the required onSearch callback
-      ),
+      SearchPageView(),
       const CartPage(),
       const SavedPage(),
       const SettingPage(),
@@ -60,4 +57,4 @@ class _MainPageState extends State<MainPage> {
       ),
     );
   }
-}
+}//mainPage

@@ -41,6 +41,10 @@ class CartPage extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
 
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
+
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return Center(
                 child: Column(
@@ -94,9 +98,9 @@ class CartPage extends StatelessWidget {
                                   item.imagePath,
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.image, size: 30),
+                                      Image.asset('assets/images/cozyshoplogo.png', fit: BoxFit.cover),
                                 )
-                                    : const Icon(Icons.broken_image),
+                                    : Image.asset('assets/images/cozyshoplogo.png', fit: BoxFit.cover),
                               ),
                               SizedBox(width: screenWidth * 0.03),
                               Expanded(
@@ -108,9 +112,17 @@ class CartPage extends StatelessWidget {
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
+                                        color: Color(0xFF561C24),
                                       ),
                                     ),
-                                    Text('\$${item.price.toStringAsFixed(2)}'),
+                                    Text(
+                                      '\$${item.price.toStringAsFixed(2)}',
+                                      style: const TextStyle(color: Color(0xFF561C24)),
+                                    ),
+                                    Text(
+                                      'Color: ${item.color}, Size: ${item.size}',
+                                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -166,8 +178,9 @@ class CartPage extends StatelessWidget {
                       Checkbox(
                         value: controller.selectAll,
                         onChanged: (value) => controller.toggleSelectAll(value),
+                        activeColor: Color(0xFF561C24),
                       ),
-                      const Text('All'),
+                      const Text('All', style: TextStyle(color: Color(0xFF561C24))),
                       const Spacer(),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -177,11 +190,12 @@ class CartPage extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
+                              color: Color(0xFF561C24),
                             ),
                           ),
                           Text(
                             '${controller.getTotalItems(cartItems)} items',
-                            style: const TextStyle(fontSize: 12),
+                            style: const TextStyle(fontSize: 12, color: Color(0xFF561C24)),
                           ),
                         ],
                       ),
@@ -194,7 +208,7 @@ class CartPage extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) =>  CheckoutView()),
+                            MaterialPageRoute(builder: (context) => CheckoutView()),
                           );
                         },
                         child: const Text(

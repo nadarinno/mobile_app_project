@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class ReviewsLogic {
   Future<List<Map<String, dynamic>>> fetchReviews(String productId) async {
     try {
+      print("Querying reviews for productId: $productId at ${DateTime.now()}");
       final reviewsSnapshot = await FirebaseFirestore.instance
           .collection('products')
           .doc(productId)
@@ -11,10 +12,12 @@ class ReviewsLogic {
           .orderBy('timestamp', descending: true)
           .get();
       final reviews = reviewsSnapshot.docs.map((doc) {
+        final data = doc.data();
         return {
-          'text': doc['text'] as String,
-          'userId': doc['userId'] as String,
-          'timestamp': doc['timestamp'] as Timestamp,
+          'text': data['text'] as String? ?? 'No text',
+          'userId': data['userId'] as String? ?? 'unknown',
+          'userName': data['userName'] as String? ?? 'Anonymous',
+          'timestamp': data['timestamp'] as Timestamp? ?? Timestamp.now(),
         };
       }).toList();
       print("Fetched ${reviews.length} reviews for productId: $productId at ${DateTime.now()}");
@@ -28,6 +31,7 @@ class ReviewsLogic {
   Future<void> submitReview({
     required String productId,
     required String reviewText,
+    required String userName,
   }) async {
     try {
       print("Submitting review for productId: $productId at ${DateTime.now()}");
@@ -38,6 +42,7 @@ class ReviewsLogic {
           .add({
         'text': reviewText,
         'userId': FirebaseAuth.instance.currentUser?.uid ?? 'anonymous',
+        'userName': userName,
         'timestamp': FieldValue.serverTimestamp(),
       });
       print("Review submitted successfully for productId: $productId at ${DateTime.now()}");

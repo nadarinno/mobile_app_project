@@ -3,9 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/Logic/reviews_logic.dart';
 import 'package:mobile_app_project/View/Login.dart';
+
 class ReviewsController extends ChangeNotifier {
   List<Map<String, dynamic>> productReviews = [];
   bool isLoading = true;
+  String? errorMessage;
   final ReviewsLogic _logic = ReviewsLogic();
   final TextEditingController reviewController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -15,18 +17,25 @@ class ReviewsController extends ChangeNotifier {
   Future<void> fetchReviews(String productId) async {
     print("Starting fetchReviews for productId: $productId at ${DateTime.now()}");
     isLoading = true;
+    errorMessage = null;
     notifyListeners();
 
     try {
       final reviews = await _logic.fetchReviews(productId);
       productReviews = reviews;
       print("Fetched ${productReviews.length} reviews for productId: $productId at ${DateTime.now()}");
+      if (reviews.isNotEmpty) {
+        print("Review data: ${reviews.map((r) => 'Text: ${r['text']}, User: ${r['userName']}, Time: ${r['timestamp']}').toList()}");
+      } else {
+        print("No reviews found for productId: $productId");
+      }
     } catch (e) {
       print("Error in fetchReviews: $e at ${DateTime.now()}");
+      errorMessage = e.toString();
       productReviews = [];
     } finally {
       isLoading = false;
-      print("Fetch reviews completed, isLoading: $isLoading at ${DateTime.now()}");
+      print("Fetch reviews completed, isLoading: $isLoading, error: $errorMessage at ${DateTime.now()}");
       notifyListeners();
     }
   }
@@ -55,6 +64,7 @@ class ReviewsController extends ChangeNotifier {
       await _logic.submitReview(
         productId: productId,
         reviewText: reviewController.text,
+        userName: _auth.currentUser?.displayName ?? 'Anonymous',
       );
 
       await fetchReviews(productId); // Refresh reviews

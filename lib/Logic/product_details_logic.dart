@@ -13,7 +13,6 @@ class ProductDetailsLogic {
       final data = doc.data()!;
       print("Raw document data for productId $productId: $data at ${DateTime.now()}");
 
-      // Handle both 'image' and 'images' fields
       List<String> images = [];
       if (data['images'] != null) {
         var rawImages = List<String>.from(data['images']);
@@ -79,22 +78,52 @@ class ProductDetailsLogic {
         throw Exception("User not authenticated");
       }
 
-      print("Adding to cart for productId: $productId at ${DateTime.now()}");
-      await FirebaseFirestore.instance
+      // Ensure the users/{userId} document exists
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+      if (!userDoc.exists) {
+        throw Exception("User document does not exist. Please complete your profile.");
+      }
+
+      // Check for existing cart item with same productId, color, and size
+      final cartQuery = await FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
           .collection('cart')
-          .add({
-        'productId': productId,
-        'name': productName,
-        'price': productPrice,
-        'imagePaths': imagePaths,
-        'selectedColor': selectedColor,
-        'selectedSize': selectedSize,
-        'quantity': 1,
-        'addedAt': FieldValue.serverTimestamp(),
-      });
-      print("Successfully added to cart for productId: $productId at ${DateTime.now()}");
+          .where('productId', isEqualTo: productId)
+          .where('color', isEqualTo: selectedColor)
+          .where('size', isEqualTo: selectedSize)
+          .limit(1)
+          .get();
+
+      if (cartQuery.docs.isNotEmpty) {
+        // Update quantity if item exists
+        final cartItem = cartQuery.docs.first;
+        final currentQuantity = cartItem.data()['quantity'] as int;
+        await cartItem.reference.update({
+          'quantity': currentQuantity + 1,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+        print("Updated quantity for cart item ${cartItem.id} for productId: $productId at ${DateTime.now()}");
+      } else {
+        // Add new cart item
+        final cartData = {
+          'productId': productId,
+          'name': productName,
+          'price': productPrice,
+          'image': imagePaths.isNotEmpty ? imagePaths.first : '',
+          'color': selectedColor,
+          'size': selectedSize,
+          'quantity': 1,
+          'createdAt': FieldValue.serverTimestamp(),
+        };
+        print("Adding new cart item with data: $cartData at ${DateTime.now()}");
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .collection('cart')
+            .add(cartData);
+        print("Successfully added new cart item for productId: $productId at ${DateTime.now()}");
+      }
     } catch (e) {
       print("Error adding to cart: $e at ${DateTime.now()}");
       throw Exception("Failed to add to cart: $e");

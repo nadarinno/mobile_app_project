@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/Controller/reviews_controller.dart';
 import 'package:intl/intl.dart';
@@ -66,14 +67,31 @@ class _ReviewsPageState extends State<ReviewsPage> {
               ),
               SizedBox(height: height * 0.01),
               Expanded(
-                child: _controller.productReviews.isNotEmpty
+                child: _controller.errorMessage != null
+                    ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Error: ${_controller.errorMessage}",
+                        style: TextStyle(fontSize: width * 0.04, color: Colors.red),
+                        textAlign: TextAlign.center,
+                      ),
+                      TextButton(
+                        onPressed: () => _controller.fetchReviews(widget.productId),
+                        child: const Text("Retry"),
+                      ),
+                    ],
+                  ),
+                )
+                    : _controller.productReviews.isNotEmpty
                     ? ListView.builder(
                   itemCount: _controller.productReviews.length,
                   itemBuilder: (context, index) {
                     final review = _controller.productReviews[index];
                     final dateFormat = DateFormat('yyyy-MM-dd HH:mm');
                     final formattedDate = review['timestamp'] != null
-                        ? dateFormat.format(review['timestamp'].toDate())
+                        ? dateFormat.format((review['timestamp'] as Timestamp).toDate())
                         : 'Unknown date';
                     return Padding(
                       padding: EdgeInsets.symmetric(vertical: height * 0.01),
@@ -81,12 +99,12 @@ class _ReviewsPageState extends State<ReviewsPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            review['text'],
+                            review['text'] ?? 'No text',
                             style: TextStyle(fontSize: width * 0.04, color: Colors.grey[800]),
                           ),
                           SizedBox(height: height * 0.005),
                           Text(
-                            "By: ${review['userId']}",
+                            "By: ${review['userName'] ?? 'Anonymous'}",
                             style: TextStyle(fontSize: width * 0.035, color: Colors.grey[500]),
                           ),
                           Text(
@@ -98,9 +116,11 @@ class _ReviewsPageState extends State<ReviewsPage> {
                     );
                   },
                 )
-                    : const Text(
-                  "No reviews yet.",
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                    : const Center(
+                  child: Text(
+                    "No reviews yet.",
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
                 ),
               ),
             ],
