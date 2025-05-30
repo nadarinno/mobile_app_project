@@ -166,5 +166,7 @@ class _SellerSignUpState extends State<SellerSignUp> {
       ),
     );
   }
+ 
 }
 
+ 

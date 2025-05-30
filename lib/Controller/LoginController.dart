@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app_project/Logic/AuthService.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mobile_app_project/logic/AuthService.dart';
 
 class LoginController {
   final AuthService _authService = AuthService();
@@ -31,26 +32,28 @@ class LoginController {
     return null;
   }
 
-  // Login user
-  Future<String?> login(BuildContext context) async {
+  // Login user and return status with role
+  Future<Map<String, dynamic>?> login(BuildContext context) async {
     isLoading = true;
     errorMessage = null;
     // Notify UI to update
     (context as Element).markNeedsBuild();
 
-    String? result = await _authService.login(
+    final result = await _authService.login(
       email: emailController.text.trim(),
       password: passwordController.text.trim(),
     );
 
     isLoading = false;
-    if (result != 'success') {
-      errorMessage = result;
+    if (result['status'] == 'success') {
+      // Role is already fetched in AuthService
+      return result;
+    } else {
+      errorMessage = result['message'];
+      // Notify UI to update
+      (context as Element).markNeedsBuild();
+      return result;
     }
-    // Notify UI to update
-    (context as Element).markNeedsBuild();
-
-    return result;
   }
 
   // Dispose controllers

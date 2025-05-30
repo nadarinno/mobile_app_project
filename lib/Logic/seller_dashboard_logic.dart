@@ -1,20 +1,35 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mobile_app_project/view/edit_product_view.dart';
-import 'package:mobile_app_project/Logic/delete_product_logic.dart';
-import '../utils.dart';
-import 'package:mobile_app_project/Controller/delete_product_controller.dart';
-import 'package:mobile_app_project/view/delete_product_view.dart';
-import 'package:mobile_app_project/Controller/edit_product_controller.dart';
-import 'package:mobile_app_project/Logic/edit_product_logic.dart';
 
 class SellerDashboardLogic {
+
+  Map<String, dynamic> calculateStats(List<QueryDocumentSnapshot> docs) {
+    double totalSales = 0.0;
+    int totalInventory = 0;
+
+    for (var doc in docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final price = data['price'];
+      final quantity = data['quantity'];
+
+      if (price is num && quantity is num) {
+        totalSales += price.toDouble() * quantity.toInt();
+        totalInventory += quantity.toInt();
+      }
+    }
+
+    return {
+      'totalSales': totalSales,
+      'totalInventory': totalInventory,
+      'productCount': docs.length,
+    };
+
   Widget buildStats(Stream<QuerySnapshot> productsStream) {
     return StreamBuilder<QuerySnapshot>(
       stream: productsStream,
       builder: (context, snapshot) {
-        if (!snapshot.hasData)
+        if (!snapshot.hasData) {
           return Center(child: CircularProgressIndicator());
+        }
 
         final docs = snapshot.data!.docs;
         double totalSales = 0.0;
@@ -79,13 +94,15 @@ class SellerDashboardLogic {
     return StreamBuilder<QuerySnapshot>(
       stream: productsStream,
       builder: (context, snapshot) {
-        if (snapshot.hasError)
+        if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
+        }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }
-        if (snapshot.data!.docs.isEmpty)
+        if (snapshot.data!.docs.isEmpty) {
           return Center(child: Text("No products available"));
+        }
 
         final docs = snapshot.data!.docs;
 

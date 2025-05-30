@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/Controller/product_details_controller.dart';
+import 'package:mobile_app_project/View/reviews_page.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final String productId;
@@ -17,7 +18,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   void initState() {
     super.initState();
     _controller = ProductDetailsController();
-    _controller.fetchProductData(widget.productId);
+    _controller.fetchProductData(widget.productId).catchError((e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load product: $e'), backgroundColor: Colors.red),
+      );
+    });
     _controller.addListener(_updateState);
   }
 
@@ -44,7 +49,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           color: color,
           shape: BoxShape.circle,
           border: Border.all(
-            color: isSelected ? Colors.black : Color(0xFFD0B8A8),
+            color: isSelected ? Colors.black : const Color(0xFFD0B8A8),
             width: 2,
           ),
         ),
@@ -60,7 +65,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         margin: EdgeInsets.only(right: width * 0.02, top: width * 0.02),
         padding: EdgeInsets.symmetric(horizontal: width * 0.03, vertical: width * 0.02),
         decoration: BoxDecoration(
-          color: _controller.selectedSize == sizeText ? Color(0xFF561C24) : Color(0xFFD0B8A8),
+          color: _controller.selectedSize == sizeText ? const Color(0xFF561C24) : const Color(0xFFD0B8A8),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
@@ -82,7 +87,25 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     if (_controller.isLoading) {
       return Scaffold(
         backgroundColor: Colors.white,
-        body: Center(child: CircularProgressIndicator()),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_controller.productName.isEmpty) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text("Failed to load product data"),
+              ElevatedButton(
+                onPressed: () => _controller.fetchProductData(widget.productId),
+                child: const Text("Retry"),
+              ),
+            ],
+          ),
+        ),
       );
     }
 
@@ -93,22 +116,33 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           children: [
             CustomScrollView(
               slivers: [
+                // IMAGE SECTION
                 SliverToBoxAdapter(
                   child: Stack(
                     children: [
                       AspectRatio(
                         aspectRatio: 1,
-                        child: PageView.builder(
+                        child: _controller.imagePaths.isNotEmpty
+                            ? PageView.builder(
                           itemCount: _controller.imagePaths.length,
                           onPageChanged: (index) => _controller.setCurrentImageIndex(index),
                           itemBuilder: (context, index) {
-                            return Image.asset(
-                              _controller.imagePaths[index],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                            );
+                            final imagePath = _controller.imagePaths[index];
+                            if (imagePath.startsWith('http')) {
+                              return Image.network(
+                                imagePath,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset('assets/images/cozyshoplogo.png', fit: BoxFit.cover);
+                                },
+                              );
+                            } else {
+                              return Image.asset('assets/images/cozyshoplogo.png', fit: BoxFit.cover);
+                            }
                           },
-                        ),
+                        )
+                            : Image.asset('assets/images/cozyshoplogo.png', fit: BoxFit.cover),
                       ),
                       Positioned(
                         top: height * 0.02,
@@ -117,7 +151,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           onTap: () => Navigator.pop(context),
                           child: CircleAvatar(
                             backgroundColor: Colors.white,
-                            child: Icon(Icons.arrow_back_ios, color: Color(0xFF561C24), size: width * 0.05),
+                            child: Icon(Icons.arrow_back_ios, color: const Color(0xFF561C24), size: width * 0.05),
                           ),
                         ),
                       ),
@@ -160,91 +194,139 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     ],
                   ),
                 ),
+
+                // PRODUCT INFO
                 SliverToBoxAdapter(
-                  child: Container(
-                    padding: EdgeInsets.fromLTRB(width * 0.04, height * 0.02, 0, height * 0.1),
-                    color: Color(0xFFFFFDF6),
+                  child: Padding(
+                    padding: EdgeInsets.all(width * 0.05),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(_controller.productName,
-                                style: TextStyle(fontSize: width * 0.05, fontWeight: FontWeight.bold)),
-                            Padding(
-                              padding: EdgeInsets.only(right: width * 0.04),
-                              child: Text('\$ ${_controller.productPrice.toStringAsFixed(2)}',
-                                  style: TextStyle(fontSize: width * 0.05, fontWeight: FontWeight.bold)),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: height * 0.02),
-                        Text('Color', style: TextStyle(fontSize: width * 0.04, fontWeight: FontWeight.w500)),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: _controller.availableColors.map((colorName) {
-                              print("Building color option for: $colorName");
-                              return buildColorOption(_controller.getColorFromName(colorName), colorName, width);
-                            }).toList(),
+                        Text(
+                          _controller.productName,
+                          style: TextStyle(
+                            fontSize: width * 0.06,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
                         ),
-                        SizedBox(height: height * 0.02),
-                        Text('Size', style: TextStyle(fontSize: width * 0.04, fontWeight: FontWeight.w500)),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: _controller.availableSizes.map((size) => buildSizeOption(size, width)).toList(),
-                          ),
-                        ),
-                        SizedBox(height: height * 0.02),
-                        ListTile(
-                          title: Text('Description', style: TextStyle(fontSize: width * 0.04)),
-                          trailing: Icon(
-                              _controller.showDescription ? Icons.expand_less : Icons.arrow_forward_ios,
-                              size: width * 0.05),
-                          onTap: _controller.toggleDescription,
-                        ),
-                        if (_controller.showDescription)
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: width * 0.04),
-                            child: Text(_controller.productDescription, style: TextStyle(fontSize: width * 0.035)),
-                          ),
                         SizedBox(height: height * 0.01),
-                        ListTile(
-                          title: Text('Reviews', style: TextStyle(fontSize: width * 0.04)),
-                          trailing: Icon(
-                              _controller.showReviews ? Icons.expand_less : Icons.arrow_forward_ios,
-                              size: width * 0.05),
-                          onTap: _controller.toggleReviews,
-                        ),
-                        if (_controller.showReviews)
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: width * 0.04),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: _controller.productReviews
-                                  .map((review) => Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0),
-                                child: Text("- $review", style: TextStyle(fontSize: width * 0.035)),
-                              ))
-                                  .toList(),
-                            ),
+                        Text(
+                          "\$${_controller.productPrice.toStringAsFixed(2)}",
+                          style: TextStyle(
+                            fontSize: width * 0.05,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF561C24),
                           ),
+                        ),
+                        SizedBox(height: height * 0.015),
+                        Text(
+                          _controller.productDescription.isNotEmpty
+                              ? _controller.productDescription
+                              : 'No description available',
+                          style: TextStyle(
+                            fontSize: width * 0.035,
+                            color: Colors.grey[700],
+                            height: 1.4,
+                          ),
+                        ),
+                        SizedBox(height: height * 0.03),
                       ],
                     ),
                   ),
                 ),
+
+                // COLORS
+                if (_controller.availableColors.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: width * 0.05),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Select Color",
+                            style: TextStyle(fontSize: width * 0.045, fontWeight: FontWeight.w600),
+                          ),
+                          SizedBox(height: height * 0.01),
+                          Row(
+                            children: _controller.availableColors.map((colorName) {
+                              Color color = _controller.getColorFromName(colorName);
+                              return buildColorOption(color, colorName, width);
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                // SIZES
+                if (_controller.availableSizes.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: width * 0.05),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Select Size",
+                            style: TextStyle(fontSize: width * 0.045, fontWeight: FontWeight.w600),
+                          ),
+                          SizedBox(height: height * 0.01),
+                          Wrap(
+                            children: _controller.availableSizes.map((size) => buildSizeOption(size, width)).toList(),
+                          ),
+                          SizedBox(height: height * 0.02),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                // REVIEWS SECTION
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: height * 0.015),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ReviewsPage(productId: widget.productId),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: width * 0.05, vertical: height * 0.02),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Reviews",
+                              style: TextStyle(
+                                fontSize: width * 0.045,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Icon(Icons.chevron_right, size: width * 0.06, color: Colors.black),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(child: SizedBox(height: height * 0.1)),
               ],
             ),
+
+            // BOTTOM BAR
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
               child: Container(
                 height: height * 0.08,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xFF561C24),
                   borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                 ),
@@ -253,13 +335,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     onPressed: () => _controller.addToCart(context),
                     icon: Icon(
                       _controller.isAddedToCart ? Icons.check_circle : Icons.shopping_cart,
-                      color: Color(0xFFD0B8A8),
+                      color: const Color(0xFFD0B8A8),
                       size: width * 0.06,
                     ),
                     label: Text(
                       _controller.isAddedToCart ? "Added to Cart" : "Add to Cart",
                       style: TextStyle(
-                        color: Color(0xFFD0B8A8),
+                        color: const Color(0xFFD0B8A8),
                         fontSize: width * 0.045,
                         fontWeight: FontWeight.w600,
                       ),
