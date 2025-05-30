@@ -106,6 +106,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 ),
               const SizedBox(height: 10),
               TextFormField(
+                autovalidateMode: AutovalidateMode.always,
                 controller: controller.newPasswordController,
                 decoration: const InputDecoration(
                   labelText: 'New Password',

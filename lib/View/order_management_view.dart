@@ -93,11 +93,11 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
                             style: TextStyle(color: burgundy)),
                         DropdownButton<String>(
                           value: order['status'] != null &&
-                              ['Pending', 'Delivered', 'Cancelled']
+                              ['Pending', 'confirmed,','Delivered', 'Shipped','Cancelled']
                                   .contains(order['status'])
                               ? order['status']
                               : 'Pending',
-                          items: ['Pending', 'Delivered', 'Cancelled']
+                          items: ['Pending', 'confirmed,','Delivered','Shipped', 'Cancelled']
                               .map((status) {
                             return DropdownMenuItem<String>(
                               value: status,
