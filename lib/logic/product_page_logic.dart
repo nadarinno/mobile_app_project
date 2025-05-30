@@ -1,6 +1,6 @@
+import 'package:mobile_app_project/Logic/product_card_logic.dart';
+import 'package:mobile_app_project/logic/product_logic.dart';
 
-import 'package:mobile_app_project/logic/product_card_logic.dart';
-import 'product_logic.dart';
 
 class ProductsLogic extends ProductLogic {
   Stream<List<Product>> getProducts({

@@ -1,54 +1,67 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProductDetailsLogic {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   Future<Map<String, dynamic>> fetchProductData(String productId) async {
     try {
-      print("Fetching product data...");
-      DocumentSnapshot doc = await _firestore
-          .collection('products')
-          .doc(productId)
-          .get();
+      final doc = await FirebaseFirestore.instance.collection('products').doc(productId).get();
 
-      if (doc.exists) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        print("Raw data from Firestore: $data");
-
-        // Handle colors with better error checking
-        List<String> colors = [];
-        if (data['colors'] != null) {
-          try {
-            colors = (data['colors'] as List).map((item) => item.toString().trim()).toList();
-          } catch (e) {
-            print("Error parsing colors: $e");
-            colors = ['Black', 'White']; // Default fallback
-          }
-        } else {
-          colors = ['Black', 'White']; // Default fallback
-        }
-
-        return {
-          'imagePaths': List<String>.from(data['images'] ?? []),
-          'productName': data['name'] ?? '',
-          'productPrice': (data['price'] ?? 0).toDouble(),
-          'productDescription': data['description'] ?? '',
-          'productReviews': List<String>.from(data['reviews'] ?? []),
-          'availableColors': colors,
-          'availableSizes': List<String>.from(data['sizes'] ?? []),
-          'productId': doc.id,
-        };
-      } else {
-        print("Document doesn't exist");
-        return {
-          'availableColors': ['Black', 'White'], // Default fallback
-        };
+      if (!doc.exists) {
+        throw Exception("Product not found");
       }
-    } catch (e) {
-      print("Error fetching product data: $e");
+
+      final data = doc.data()!;
+      print("Raw document data for productId $productId: $data at ${DateTime.now()}");
+
+      // Handle both 'image' and 'images' fields
+      List<String> images = [];
+      if (data['images'] != null) {
+        var rawImages = List<String>.from(data['images']);
+        images = rawImages.where((img) => img.startsWith('http') && !img.contains('assets/')).toList();
+        if (images.length != rawImages.length) {
+          print("Filtered out invalid images for productId $productId: $rawImages -> $images at ${DateTime.now()}");
+        }
+      } else if (data['image'] != null) {
+        String image = data['image'].toString();
+        if (image.startsWith('http') && !image.contains('assets/')) {
+          images = [image];
+        } else {
+          print("Invalid image URL filtered for productId $productId: $image at ${DateTime.now()}");
+        }
+      }
+
+      if (images.isEmpty) {
+        print("No valid HTTP image URLs found for productId: $productId at ${DateTime.now()}");
+      }
+
+      String name = data['name'] ?? data['(name'] ?? 'Unknown Product';
+
+      List<String> colors = [];
+      if (data['colors'] != null) {
+        colors = List<String>.from(data['colors']);
+      } else {
+        colors = ['Black', 'White'];
+      }
+
+      List<String> sizes = [];
+      if (data['sizes'] != null) {
+        sizes = List<String>.from(data['sizes']);
+      } else {
+        sizes = ['S', 'M', 'L'];
+      }
+
       return {
-        'availableColors': ['Black', 'White'], // Default fallback
+        'imagePaths': images,
+        'productName': name,
+        'productPrice': (data['price'] is num ? data['price'].toDouble() : 0.0),
+        'productDescription': data['description']?.toString() ?? 'No description available',
+        'availableColors': colors,
+        'availableSizes': sizes,
+        'productId': productId,
       };
+    } catch (e) {
+      print("Error fetching product: $e at ${DateTime.now()}");
+      throw Exception("Failed to load product: $e");
     }
   }
 
@@ -61,51 +74,47 @@ class ProductDetailsLogic {
     required String selectedSize,
   }) async {
     try {
-      print("Adding to cart with data: ");
-      print("productId: $productId");
-      print("productName: $productName");
-      print("productPrice: $productPrice");
-      print("imagePaths: $imagePaths");
-      print("selectedColor: $selectedColor");
-      print("selectedSize: $selectedSize");
-
-      // Check if this product is already in the cart
-      final querySnapshot = await _firestore
-          .collection('cart')
-          .where('productId', isEqualTo: productId)
-          .where('color', isEqualTo: selectedColor)
-          .where('size', isEqualTo: selectedSize)
-          .limit(1)
-          .get();
-
-      print("Query snapshot: ${querySnapshot.docs.length} documents found");
-
-      if (querySnapshot.docs.isNotEmpty) {
-        // Product exists in cart, update quantity
-        final doc = querySnapshot.docs.first;
-        print("Updating existing cart item: ${doc.id}");
-        await doc.reference.update({
-          'quantity': FieldValue.increment(1),
-        });
-        print("Cart item updated successfully");
-      } else {
-        // Product doesn't exist in cart, add new item
-        print("Adding new item to cart");
-        await _firestore.collection('cart').add({
-          'productId': productId,
-          'name': productName,
-          'price': productPrice,
-          'image': imagePaths.isNotEmpty ? imagePaths[0] : '',
-          'color': selectedColor,
-          'size': selectedSize,
-          'quantity': 1,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-        print("New cart item added successfully");
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        throw Exception("User not authenticated");
       }
+
+      print("Adding to cart for productId: $productId at ${DateTime.now()}");
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('cart')
+          .add({
+        'productId': productId,
+        'name': productName,
+        'price': productPrice,
+        'imagePaths': imagePaths,
+        'selectedColor': selectedColor,
+        'selectedSize': selectedSize,
+        'quantity': 1,
+        'addedAt': FieldValue.serverTimestamp(),
+      });
+      print("Successfully added to cart for productId: $productId at ${DateTime.now()}");
     } catch (e) {
-      print("Error adding to cart: $e");
-      rethrow;
+      print("Error adding to cart: $e at ${DateTime.now()}");
+      throw Exception("Failed to add to cart: $e");
+    }
+  }
+
+  Future<void> updateProductImages(String productId, List<String> imagePaths) async {
+    try {
+      final validImagePaths = imagePaths.where((img) => img.startsWith('http') && !img.contains('assets/')).toList();
+      if (validImagePaths.length != imagePaths.length) {
+        print("Filtered invalid image paths for productId $productId: $imagePaths -> $validImagePaths at ${DateTime.now()}");
+      }
+      print("Updating product images for productId: $productId with $validImagePaths at ${DateTime.now()}");
+      await FirebaseFirestore.instance.collection('products').doc(productId).update({
+        'images': validImagePaths,
+      });
+      print("Updated product images for $productId: $validImagePaths at ${DateTime.now()}");
+    } catch (e) {
+      print("Error updating product images: $e at ${DateTime.now()}");
+      throw Exception("Failed to update product images: $e");
     }
   }
 }

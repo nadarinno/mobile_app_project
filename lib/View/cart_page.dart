@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app_project/Controller/cart_controller.dart';
 import 'package:mobile_app_project/Logic/cart_item_model.dart';
 import 'package:provider/provider.dart';
+import 'checkout_view.dart';
 
 class CartPage extends StatelessWidget {
+  const CartPage({Key? key, required CartController controller}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -49,9 +52,15 @@ class CartPage extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF561C24),
                       ),
-                      onPressed: () {},
-                      child: Text('Browse Products',
-                          style: TextStyle(color: Color(0xFFFFFDF6))),
+                      onPressed: () {
+                        // Navigate to Home tab in MainPage
+                        // Assuming MainPage uses a Navigator or tab controller
+                        Navigator.pushReplacementNamed(context, '/home');
+                      },
+                      child: Text(
+                        'Browse Products',
+                        style: TextStyle(color: Color(0xFFFFFDF6)),
+                      ),
                     ),
                   ],
                 ),
@@ -68,8 +77,8 @@ class CartPage extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final item = cartItems[index];
                       return Card(
-                        margin:
-                        EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        margin: EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         color: Color(0xFFD0B8A8),
                         child: Padding(
                           padding: EdgeInsets.all(8.0),
@@ -96,7 +105,8 @@ class CartPage extends StatelessWidget {
                               SizedBox(width: screenWidth * 0.03),
                               Expanded(
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       item.name,
@@ -105,7 +115,8 @@ class CartPage extends StatelessWidget {
                                         fontSize: 16,
                                       ),
                                     ),
-                                    Text('\$${item.price.toStringAsFixed(2)}'),
+                                    Text(
+                                        '\$${item.price.toStringAsFixed(2)}'),
                                   ],
                                 ),
                               ),
@@ -113,8 +124,10 @@ class CartPage extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    icon: Icon(Icons.remove_circle_outline,
-                                        color: Color(0xFF561C24), size: 20),
+                                    icon: Icon(
+                                        Icons.remove_circle_outline,
+                                        color: Color(0xFF561C24),
+                                        size: 20),
                                     onPressed: () => controller.updateQuantity(
                                         item.id, item.quantity - 1),
                                   ),
@@ -144,7 +157,8 @@ class CartPage extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
                     color: Color(0xFFD0B8A8),
                     border: Border(top: BorderSide(color: Colors.grey)),
@@ -153,7 +167,8 @@ class CartPage extends StatelessWidget {
                     children: [
                       Checkbox(
                         value: controller.selectAll,
-                        onChanged: (value) => controller.toggleSelectAll(value),
+                        onChanged: (value) =>
+                            controller.toggleSelectAll(value),
                       ),
                       Text('All'),
                       Spacer(),
@@ -179,7 +194,13 @@ class CartPage extends StatelessWidget {
                           minimumSize: Size(screenWidth * 0.25, 48),
                           backgroundColor: Color(0xFF561C24),
                         ),
-                        onPressed: () => controller.checkout(cartItems, context),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CheckoutView()),
+                          );
+                        },
                         child: Text(
                           'Checkout',
                           style: TextStyle(color: Color(0xFFFFFDF6)),
@@ -193,23 +214,8 @@ class CartPage extends StatelessWidget {
           },
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 3,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Color(0xFFFFFDF6),
-        selectedItemColor: Color(0xFF561C24),
-        unselectedItemColor: Color(0xFFD0B8A8),
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.favorite_border), label: 'Saved'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_cart), label: 'Cart'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle), label: 'Account'),
-        ],
-      ),
+      // Removed bottomNavigationBar to rely on MainPage's navigation
+      // MainPage should handle tab navigation (Home, Search, Saved, Cart, Account)
     );
   }
 }

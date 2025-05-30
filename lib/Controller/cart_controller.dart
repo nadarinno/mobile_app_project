@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/Logic/cart_item_model.dart';
 
@@ -10,10 +12,16 @@ class CartController extends ChangeNotifier {
     _initialize();
   }
 
-  void _initialize() async {
-    await Future.delayed(Duration(seconds: 1));
-    isLoading = false;
-    notifyListeners();
+  Future<void> _initialize() async {
+    try {
+      await Future.delayed(const Duration(seconds: 1)); // Simulate loading
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      print('Error initializing CartController: $e');
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   Stream<List<CartItem>> get cartItems => _cartModel.getCartItems();
@@ -45,7 +53,7 @@ class CartController extends ChangeNotifier {
   Future<void> checkout(List<CartItem> items, BuildContext context) async {
     await _cartModel.checkout(items);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Order placed successfully!')),
+      const SnackBar(content: Text('Order placed successfully!')),
     );
     notifyListeners();
   }
