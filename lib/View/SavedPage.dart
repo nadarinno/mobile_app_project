@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobile_app_project/Controller/SavedPageController.dart';
 
@@ -17,21 +16,29 @@ class _SavedPageState extends State<SavedPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    // Initialize animations after the first frame
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      controller.savedItemsStream.listen((snapshot) {
-        for (var doc in snapshot.docs) {
-          final productId = doc.id;
-          if (!_animationControllers.containsKey(productId)) {
-            _animationControllers[productId] = controller.initAnimationController(
-              productId,
-              this,
-              delay: 100 * snapshot.docs.indexOf(doc),
-            );
-          }
+    // Initialize animation controllers when stream emits data
+    controller.savedItemsStream.listen(
+      (snapshot) {
+        if (mounted) {
+          setState(() {
+            for (var doc in snapshot.docs) {
+              final productId = doc.id;
+              if (!_animationControllers.containsKey(productId)) {
+                _animationControllers[productId] = controller
+                    .initAnimationController(
+                      productId,
+                      this,
+                      delay: 100 * snapshot.docs.indexOf(doc),
+                    );
+              }
+            }
+          });
         }
-      });
-    });
+      },
+      onError: (error) {
+        debugPrint('Error in savedItemsStream: $error');
+      },
+    );
   }
 
   @override
@@ -45,11 +52,12 @@ class _SavedPageState extends State<SavedPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     if (!controller.isAuthenticated) {
-      return const Center(child: Text('Please log in to view saved items'));
+      return const Scaffold(
+        body: Center(child: Text('Please log in to view saved items')),
+      );
     }
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text(
           'Saved Items',
@@ -61,11 +69,9 @@ class _SavedPageState extends State<SavedPage> with TickerProviderStateMixin {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
+
       ),
+      backgroundColor: Colors.grey[50],
       body: StreamBuilder<QuerySnapshot>(
         stream: controller.savedItemsStream,
         builder: (context, snapshot) {
@@ -77,7 +83,7 @@ class _SavedPageState extends State<SavedPage> with TickerProviderStateMixin {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final savedItems = snapshot.data!.docs;
+          final savedItems = snapshot.data?.docs ?? [];
 
           if (savedItems.isEmpty) {
             return Center(
@@ -92,10 +98,7 @@ class _SavedPageState extends State<SavedPage> with TickerProviderStateMixin {
                   const SizedBox(height: 16),
                   Text(
                     'No saved items yet',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -111,29 +114,41 @@ class _SavedPageState extends State<SavedPage> with TickerProviderStateMixin {
               final animationController = _animationControllers[productId];
 
               return SlideTransition(
-                position: animationController != null
-                    ? Tween<Offset>(
-                  begin: const Offset(1, 0),
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(
-                  parent: animationController,
-                  curve: Curves.easeOutQuart,
-                ))
-                    : const AlwaysStoppedAnimation(Offset.zero),
+                position:
+                    animationController != null
+                        ? Tween<Offset>(
+                          begin: const Offset(1, 0),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: animationController,
+                            curve: Curves.easeOutQuart,
+                          ),
+                        )
+                        : const AlwaysStoppedAnimation(Offset.zero),
                 child: Opacity(
                   opacity: animationController?.value ?? 1,
                   child: _SavedItemCard(
                     item: item,
                     onToggleSaved: () {
                       if (animationController != null) {
-                        controller.deleteSavedItem(productId, animationController, context).then((_) {
-                          setState(() {
-                            _animationControllers.remove(productId);
-                          });
-                        });
+                        controller
+                            .deleteSavedItem(
+                              productId,
+                              animationController,
+                              context,
+                            )
+                            .then((_) {
+                              if (mounted) {
+                                setState(() {
+                                  _animationControllers.remove(productId);
+                                });
+                              }
+                            });
                       }
                     },
-                    onViewProduct: () => controller.viewProduct(item['name'], context),
+                    onViewProduct:
+                        () => controller.viewProduct(item['name'], context),
                   ),
                 ),
               );
@@ -181,17 +196,21 @@ class _SavedItemCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8),
-                    image: DecorationImage(
-                      image: NetworkImage(item['image'] ?? 'assets/images/cozyshoplogo.png'),
-                      fit: BoxFit.cover,
-                      onError: (exception, stackTrace) => const AssetImage('assets/images/cozyshoplogo.png'),
-                    ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    item['image'] ?? '',
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/images/cozyshoplogo.png',
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -221,10 +240,7 @@ class _SavedItemCard extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: onToggleSaved,
-                  icon: const Icon(
-                    Icons.favorite,
-                    color: Color(0xFF561C24),
-                  ),
+                  icon: const Icon(Icons.favorite, color: Color(0xFF561C24)),
                 ),
               ],
             ),

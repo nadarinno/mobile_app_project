@@ -24,7 +24,7 @@ class CustomBottomNavBar extends StatelessWidget {
         BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
         BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
         BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Saved'),
-        BottomNavigationBarItem(icon: Icon(Icons.account_circle_outlined), label: 'Account '),
+        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings '),
 
 
 

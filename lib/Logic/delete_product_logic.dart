@@ -6,7 +6,11 @@ class DeleteProductLogic {
 
   DeleteProductLogic(this.controller);
 
-  void deleteProduct(BuildContext context, String docId, VoidCallback updateTotals) {
-    controller.deleteProduct(context, docId, updateTotals);
+  Future<void> deleteProduct(
+    BuildContext context,
+    String docId,
+    VoidCallback updateTotals,
+  ) async {
+    await controller.deleteProduct(context, docId, updateTotals);
   }
 }

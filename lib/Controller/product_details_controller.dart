@@ -1,10 +1,12 @@
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_app_project/Logic/cart_item_model.dart';
 import 'package:mobile_app_project/Logic/product_details_logic.dart';
 import 'package:mobile_app_project/View/Login.dart';
+import 'package:provider/provider.dart';
 import '../utils.dart' as utils;
+import 'cart_controller.dart';
 
 class ProductDetailsController extends ChangeNotifier {
   int currentImageIndex = 0;
@@ -84,14 +86,18 @@ class ProductDetailsController extends ChangeNotifier {
 
     try {
       print("Adding to cart for productId: $productId at ${DateTime.now()}");
-      await _logic.addToCart(
+      final cartItem = CartItem(
+        id: '', // Will be set by Firestore
         productId: productId,
-        productName: productName,
-        productPrice: productPrice,
-        imagePaths: imagePaths,
-        selectedColor: selectedColor,
-        selectedSize: selectedSize,
+        name: productName,
+        price: productPrice,
+        imagePath: imagePaths.isNotEmpty ? imagePaths.first : '',
+        color: selectedColor,
+        size: selectedSize,
+        quantity: 1,
       );
+
+      await Provider.of<CartController>(context, listen: false).addToCart(cartItem);
 
       isAddedToCart = true;
       notifyListeners();

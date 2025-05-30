@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../Controller/search_controller.dart';
 

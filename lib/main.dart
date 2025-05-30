@@ -1,9 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'firebase_options.dart';
 import 'Logic/notification_handler.dart';
 import 'Controller/cart_controller.dart';
+import 'Controller/checkout_controller.dart';
 import 'View/Login.dart';
 import 'View/MainPage.dart';
 import 'View/HomePage.dart';
@@ -17,14 +19,15 @@ import 'View/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => CartController()),
+        ChangeNotifierProvider(
+          create: (context) => CheckoutController(),
+        ), // Add this provider
       ],
       child: const MyApp(),
     ),
@@ -38,6 +41,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -49,7 +53,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomePage(),
         '/notifications': (context) => const NotificationPage(),
         '/saved': (context) => const SavedPage(),
-        '/cart': (context) => const CartPage(), // Updated to remove controller
+        '/cart': (context) => const CartPage(),
         '/product_details': (context) {
           final Object? args = ModalRoute.of(context)?.settings.arguments;
           final String productId = (args is String) ? args : '';
@@ -60,8 +64,9 @@ class MyApp extends StatelessWidget {
           final String productId = (args is String) ? args : '';
           return ReviewsPage(productId: productId);
         },
-        '/checkout': (context) =>  CheckoutView(),
+        '/checkout': (context) => CheckoutView(),
       },
     );
   }
 }
+

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app_project/View/search_page_view.dart';
 import 'package:mobile_app_project/View/HomePage.dart';
-
+import 'package:mobile_app_project/View/NotificationPage.dart';
 import 'package:mobile_app_project/View/SavedPage.dart';
 import 'package:mobile_app_project/View/cart_page.dart';
 import '../widgets/bottom_nav_bar.dart';
@@ -29,6 +29,13 @@ class _MainPageState extends State<MainPage> {
     ];
   }
 
+  // Handler for search input
+  void _handleSearch(String query) {
+
+    print('Search query: $query');
+
+  }
+
   void _onItemTapped(int index) {
     if (index >= 0 && index < _pages.length) {
       setState(() {
@@ -50,4 +57,4 @@ class _MainPageState extends State<MainPage> {
       ),
     );
   }
-}
+}//mainPage
