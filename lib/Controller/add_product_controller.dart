@@ -30,55 +30,52 @@ class AddProductController {
   Future<void> saveProduct(
       BuildContext context, GlobalKey<FormState> formKey, VoidCallback updateTotals, AddProductLogic logic) async {
     if (!formKey.currentState!.validate()) {
-      print("Form validation failed");
+      print("Form validation failed at ${DateTime.now()}");
       return;
     }
 
     try {
-      print("Starting product save process...");
+      print("Starting product save process at ${DateTime.now()}");
 
-      // Check if user is authenticated
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        throw Exception("No user is signed in. Please log in.");
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        throw Exception("User not authenticated");
       }
-      print("Authenticated user UID: ${user.uid}");
 
-      // Check if user is a seller
-      final userDoc = await _firestore.collection('users').doc(user.uid).get();
+      // Verify the user is a seller
+      final userDoc = await _firestore.collection('users').doc(userId).get();
       if (!userDoc.exists || userDoc.data()?['role'] != 'seller') {
-        throw Exception("You are not authorized to add products. Only sellers can add products.");
+        throw Exception("User is not a seller");
       }
-      print("User role verified: seller");
 
       final name = logic.nameController.text.trim();
       final price = double.tryParse(logic.priceController.text.trim()) ?? 0.0;
       final quantity = int.tryParse(logic.quantityController.text.trim()) ?? 0;
       final description = logic.descriptionController.text.trim();
 
-      print("Validating inputs...");
+      print("Validating inputs at ${DateTime.now()}...");
       if (name.isEmpty) throw Exception("Product name cannot be empty");
       if (price <= 0) throw Exception("Price must be greater than 0");
       if (quantity < 0) throw Exception("Quantity cannot be negative");
 
       List<String> imageUrls = [];
       if (logic.imageFiles.isNotEmpty) {
-        print("Uploading images...");
+        print("Uploading images at ${DateTime.now()}...");
         try {
           imageUrls = await uploadImages(logic.imageFiles);
-          print("Images uploaded successfully: $imageUrls");
+          print("Images uploaded successfully: $imageUrls at ${DateTime.now()}");
         } catch (e) {
-          print("Image upload failed: $e");
+          print("Image upload failed: $e at ${DateTime.now()}");
           throw Exception("Image upload failed: $e");
         }
       } else {
-        print("No images selected");
+        print("No images selected at ${DateTime.now()}");
       }
 
       final product = {
-        'sellerId': user.uid, // Added to satisfy Firestore rules
+        'sellerId': userId, // Added to match security rules
         'name': name,
-        'price': price,
+        'price': price.toDouble(), // Ensure float
         'quantity': quantity,
         'description': description,
         'images': imageUrls,
@@ -86,9 +83,9 @@ class AddProductController {
         'createdAt': FieldValue.serverTimestamp(),
       };
 
-      print("Saving to Firestore: $product");
+      print("Saving to Firestore with data: $product at ${DateTime.now()}...");
       final docRef = await _firestore.collection('products').add(product);
-      print("✅ Product saved with ID: ${docRef.id}");
+      print("✅ Product saved with ID: ${docRef.id} at ${DateTime.now()}");
 
       updateTotals();
       logic.resetForm(formKey);
@@ -99,7 +96,7 @@ class AddProductController {
 
       Navigator.of(context).pop();
     } catch (e) {
-      print("Error saving product: $e");
+      print("Error saving product: $e at ${DateTime.now()}");
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
