@@ -197,7 +197,14 @@ class HomePageContent extends StatelessWidget {
                     products[index].data() as Map<String, dynamic>;
                 final String productName =
                     productData['name'] as String? ?? 'Unnamed Product';
-                final String? imageUrl = productData['image'] as String?;
+                final List<String> imageUrls =
+                    (productData['images'] is List)
+                        ? (productData['images'] as List).cast<String>()
+                        : [];
+                final String imageUrl =
+                    imageUrls.isNotEmpty
+                        ? imageUrls.first
+                        : 'assets/images/cozyshoplogo.png';
                 final double productPrice =
                     (productData['price'] is num)
                         ? (productData['price'] as num).toDouble()
