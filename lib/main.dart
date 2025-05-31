@@ -17,6 +17,31 @@ import 'View/reviews_page.dart';
 import 'View/checkout_view.dart';
 import 'View/splash_screen.dart';
 
+// Utility class for responsive design
+class Responsive {
+  static bool isMobile(BuildContext context) =>
+      MediaQuery.of(context).size.width < 600;
+
+  static bool isTablet(BuildContext context) =>
+      MediaQuery.of(context).size.width >= 600 &&
+          MediaQuery.of(context).size.width < 1024;
+
+  static bool isDesktop(BuildContext context) =>
+      MediaQuery.of(context).size.width >= 1024;
+
+  static double getWidth(BuildContext context, {double mobile = 0.9, double tablet = 0.7, double desktop = 0.5}) {
+    if (isDesktop(context)) return MediaQuery.of(context).size.width * desktop;
+    if (isTablet(context)) return MediaQuery.of(context).size.width * tablet;
+    return MediaQuery.of(context).size.width * mobile;
+  }
+
+  static double getPadding(BuildContext context, {double mobile = 16.0, double tablet = 32.0, double desktop = 64.0}) {
+    if (isDesktop(context)) return desktop;
+    if (isTablet(context)) return tablet;
+    return mobile;
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -25,9 +50,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => CartController()),
-        ChangeNotifierProvider(
-          create: (context) => CheckoutController(),
-        ), // Add this provider
+        ChangeNotifierProvider(create: (context) => CheckoutController()),
       ],
       child: const MyApp(),
     ),
@@ -45,6 +68,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        // Define text styles for responsiveness
+        textTheme: Theme.of(context).textTheme.apply(
+          fontSizeFactor: Responsive.isDesktop(context)
+              ? 1.2
+              : Responsive.isTablet(context)
+              ? 1.1
+              : 1.0,
+        ),
       ),
       home: const SplashScreen(),
       routes: {
@@ -70,3 +101,78 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// Example of an adaptive HomePage
+class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home'),
+        centerTitle: Responsive.isMobile(context),
+      ),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: EdgeInsets.all(Responsive.getPadding(context)),
+              child: Center(
+                child: Container(
+                  width: Responsive.getWidth(context),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Adaptive grid for products
+                      OrientationBuilder(
+                        builder: (context, orientation) {
+                          return GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: Responsive.isDesktop(context)
+                                  ? 4
+                                  : Responsive.isTablet(context)
+                                  ? 3
+                                  : 2,
+                              crossAxisSpacing: 16.0,
+                              mainAxisSpacing: 16.0,
+                              childAspectRatio: orientation == Orientation.portrait ? 0.7 : 1.0,
+                            ),
+                            itemCount: 8, // Example item count
+                            itemBuilder: (context, index) {
+                              return Card(
+                                elevation: 2,
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        color: Colors.grey[300],
+                                        child: const Center(child: Text('Product Image')),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        'Product $index',
+                                        style: Theme.of(context).textTheme.titleMedium,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}

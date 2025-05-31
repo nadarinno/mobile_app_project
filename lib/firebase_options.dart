@@ -17,10 +17,8 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
+
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -65,5 +63,13 @@ class DefaultFirebaseOptions {
     projectId: 'cozyshop-bdc9e',
     storageBucket: 'cozyshop-bdc9e.firebasestorage.app',
   );
-
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDT9ZvIhtOwFyoT_Ba4T68gST8XMOaxrho',
+    authDomain: 'cozyshop-bdc9e.firebaseapp.com',
+    projectId: 'cozyshop-bdc9e',
+    storageBucket: 'cozyshop-bdc9e.firebasestorage.app',
+    messagingSenderId: '214977947385',
+    appId: '1:214977947385:web:1591f5e1978e8cfb84e428',
+    measurementId: 'G-51L3N8HXWX',
+  );
 }

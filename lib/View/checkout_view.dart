@@ -218,10 +218,21 @@ class CheckoutView extends StatelessWidget {
                           minimumSize: Size(screenWidth, 48),
                           backgroundColor: Color(0xFF561C24),
                         ),
-                        onPressed: () => checkoutController.confirmOrder(
-                            context, cartItems),
+                        onPressed: () {
+                          if (checkoutController.formKey.currentState!.validate()) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PaymentSelectionView(
+                                  cartItems: cartItems,
+                                  totalPrice: cartController.getTotalPrice(cartItems),
+                                ),
+                              ),
+                            );
+                          }
+                        },
                         child: Text(
-                          'Confirm Order',
+                          'Proceed to Payment',
                           style: TextStyle(
                             color: Color(0xFFFFFDF6),
                             fontSize: 16,
@@ -235,6 +246,134 @@ class CheckoutView extends StatelessWidget {
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+class PaymentSelectionView extends StatelessWidget {
+  final List<CartItem> cartItems;
+  final double totalPrice;
+
+  const PaymentSelectionView({
+    Key? key,
+    required this.cartItems,
+    required this.totalPrice,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final checkoutController = Provider.of<CheckoutController>(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return Scaffold(
+      backgroundColor: Color(0xFFFFFDF6),
+      appBar: AppBar(
+        backgroundColor: Color(0xFFFFFDF6),
+        elevation: 0,
+        leading: BackButton(color: Color(0xFF561C24)),
+        title: Text('Select Payment Method', style: TextStyle(color: Color(0xFF561C24))),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Choose Payment Method',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF561C24),
+                ),
+              ),
+              SizedBox(height: 16),
+              _buildPaymentOption(
+                context,
+                'Credit/Debit Card',
+                Icons.credit_card,
+                    () => checkoutController.confirmOrder(context, cartItems),
+              ),
+              SizedBox(height: 12),
+              _buildPaymentOption(
+                context,
+                'PayPal',
+                Icons.payment,
+                    () => checkoutController.confirmOrder(context, cartItems),
+              ),
+              SizedBox(height: 12),
+              _buildPaymentOption(
+                context,
+                'Cash on Delivery',
+                Icons.money,
+                    () => checkoutController.confirmOrder(context, cartItems),
+              ),
+              SizedBox(height: 24),
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Color(0xFFD0B8A8),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Total Amount',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      '\$${totalPrice.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF561C24),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Spacer(),
+              checkoutController.isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(screenWidth, 48),
+                    backgroundColor: Color(0xFF561C24),
+                  ),
+                  onPressed: () => checkoutController.confirmOrder(context, cartItems),
+                  child: Text(
+                    'Confirm Payment',
+                    style: TextStyle(
+                      color: Color(0xFFFFFDF6),
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentOption(
+      BuildContext context,
+      String title,
+      IconData icon,
+      VoidCallback onTap,
+      ) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: ListTile(
+        leading: Icon(icon, color: Color(0xFF561C24)),
+        title: Text(title),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF561C24)),
+        onTap: onTap,
       ),
     );
   }
